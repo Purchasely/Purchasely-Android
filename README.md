@@ -36,7 +36,7 @@ allprojects {
 
 Add the sdk to your dependencies
 ```groovy
-implementation 'io.purchasely:purchasely:0.2.3'
+implementation 'io.purchasely:purchasely:0.2.4'
 ```
 
 ### Initialize the SDK
@@ -70,71 +70,77 @@ To remove the user (logged out) you can perform a :
 Purchasely.userId = null
 ```
 
-### Notify when the app is ready
-
-The SDK needs to display messages above your UI. It can be the continuation of a purchase started on the App Store, the result from a notification linking to our product, …
-
-Your app needs to tell Purchasely SDK when it is ready to be covered by our UI.
-
-This is done to handle cases like:
-* a loading screen that dismisses upon completion
-* an on boarding that needs to be displayed before purchasing
-* a subscribe process mandatory for app usage
-
-When your app is ready, call the following method and the SDK will handle the continuation of whatever was in progress (purchase, push message, …)
-
-```swift
-Purchasely.isReadyToPurchase(true)
+Or in Java
+```java
+Purchasey.setUserId("null");
 ```
-
-You can set it back to false when the app goes in the background when you have a screen that blocks UI in background mode and that is dismissed when the app is in foreground (like in banking apps).
-
 
 ### Present products
 
 Purchasely handles all the presentation logic of your products configured in the back office.
-You can ask for the SDK to give you the `UIViewController` presenting the purchase by calling the following :
+You can ask for the SDK to give you the `androidx.fragment.app.Fragment` presenting the purchase by calling the following :
 
-```swift
-// Show an activity indicator while the offer is being loaded
-Purchasely.productController(for: "my_product_id", success: { [weak self](controller) in
-	self?.present(controller, animated: true, completion: nil)
-}, failure: { _ in
-	// Display error and replace by your own fallback page ?
-})
+```kotlin
+Purchasely.displayProduct(/*Your Product id*/ "",
+    success = { fragment ->
+	supportFragmentManager.beginTransaction()
+	    .addToBackStack(null)
+	    .replace(R.id.inappFragment, fragment, "InAppFragment")
+	    .commitAllowingStateLoss()
+
+	progressBar.isVisible = false
+    },
+    failure = { error ->
+	Log.e("Product", "Error", error)
+	Snackbar.make(window.decorView, error.message ?: "error", Snackbar.LENGTH_SHORT).show()
+    }
+)
+```
+A coroutine version also exists `suspend fun displayProduct(productId: String) : Fragment?`
+
+Or in Java
+
+```java
+Purchasely.displayProduct("YOUR_PRODUCT_ID", new DisplayProductListener() {
+    @Override
+    public void onFailure(@NotNull Throwable throwable) {
+	Log.e("Product", "Error", throwable);
+	String message = "error";
+	if(throwable.getMessage() != null) {
+	    message = throwable.getMessage();
+	}
+	Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSuccess(@NotNull Fragment fragment) {
+	getSupportFragmentManager().beginTransaction()
+		.addToBackStack(null)
+		.replace(R.id.inappFragment, fragment, "InAppFragment")
+		.commitAllowingStateLoss();
+
+	findViewById(R.id.progressBar).setVisibility(View.GONE);
+    }
+});
 ```
 
-You can be alerted if the purchase was made by listening to the [Notifications](#notifications)
+You can place the fragment wherever your want in another fragment or activity.
 
-## ↕️ Choose how you want the offers to be presented
-
-Once the `isReadyToPurchase` is set the SDK can pop windows above your UI, it can be Alerts, Product pages …
-
-You might want to override them of chose to display them in another way. For example a side bar with the offer on iPad.
-You can override the default behaviors using the `PLYUIDelegate`.
-
-```swift
-Purchasely.setUIDelegate(self)
-```
-
-To change the transition, size, position … of a presented controller (`PLYUIControllerType` gives you the type of controller displayed):
-```
-func display(controller: UIViewController, type: PLYUIControllerType)
-```
+You can be alerted if the purchase was made by listening to the LiveData `livePurchase()`
 
 ## 📈 Integrate In App events to your analytics system
 
 Purchasely tracks every action perfomed but you might also wish to insert these events to your own tracking system.
-You can receive the events (`PLYEvent`) by setting yourself as a delegate (`PLYEventDelegate`), either from the `start` method:
+You can receive the events (`PLYEvent`) by setting yourself as a listener (`EventListener`), either from the `start` method:
 
-```swift
-Purchasely.start(withAPIKey: "API_KEY", eventDelegate: self)
+```kotlin
+Purchasely.start(applicationContext, "API_KEY", eventListener = myEventListener)
 ```
 
 or later 
 
-```swift
-Purchasely.setEventDelegate(self)
+```kotlin
+Purchasely.eventListener = myEventListener
 ```
 
 ## 🚨 Custom error and alert views
@@ -143,7 +149,7 @@ Some information messages are also displayed to the user during the purchase lif
 - Purchase completed
 - Restoration completed
 
-These alerts are listed in `PLYAlertMessage` enum. 
+These alerts are listed in `PLYUI` enum. 
 
 Many errors can occure during the purchase process and are embedded in these messages liek:
 - Network error
@@ -153,13 +159,39 @@ Many errors can occure during the purchase process and are embedded in these mes
 - …
 These errors are listed in `PLYError` object and translated in the supported languages of the SDK.
 
-The SDK offers a way to display these using a standard `UIAlertController` message with a single `Ok` button to dismiss.
+The SDK offers a way to display these using a standard `AlertDialog` message with a single `Ok` button to dismiss.
 
-If you wish to offer a nicer way to display error messages, a way that reflects more your app, you can override by setting yourself as the delegate (`PLYUIDelegate`) you will then be responsible for displaying the messages yourself.
+If you wish to offer a nicer way to display error messages, a way that reflects more your app, you can override by setting yourself as the listener (`UIListener`) you will then be responsible for displaying the messages yourself.
 
-```swift
-Purchasely.setUIDelegate(self)
+```kotlin
+Purchasely.uiListener = object : UIListener {
+    override fun onAlert(alert: PLYUI) {
+	when(alert) {
+	    PLYUI.InAppSuccess -> TODO()
+	    PLYUI.InAppDeferred -> TODO()
+	    PLYUI.InAppSuccessUnauthentified -> TODO()
+	    PLYUI.InAppRestorationSuccess -> TODO()
+	    is PLYUI.InAppRestorationError -> TODO()
+	    is PLYUI.InAppError -> TODO()
+	}
+    }
+
+}
 ```
+
+Or in Java
+
+```java
+Purchasely.setUiListener(new UIListener() {
+    @Override
+    public void onAlert(@NotNull PLYUI ui) {
+	if(ui instanceof PLYUI.InAppSuccess) {
+	    //TODO display success view
+	}
+    }
+});
+```
+
 That way you could also override the behaviour and trigger some specific actions when the user taps on the button for example.
 
 
@@ -191,75 +223,82 @@ To do so, you just need to set the key and value corresponding to the message yo
 
 ## 🔓 Unlock content / service once a purchase is made
 
-Once the purchase is made to Apple Servers, registered in our systems, Purchasely sends a local `Notification` in the `NotificationCenter`.
+Once the purchase is made to Google Servers, registered in our systems, Purchasely sends a LiveData.
 You can use it to unlock the content or refresh it.
 
 You can catch it like this
 
-```swift
-NotificationCenter.default.addObserver(self, selector: #selector(reloadContent(_:)), name: .ply_purchasedSubscription, object: nil)
+```kotlin
+Purchasely.livePurchase().observe(this, Observer {
+    Log.d("Purchasely", "User purchased $it")
+    Snackbar.make(recyclerView, "Purchased ${it?.vendorId}", Snackbar.LENGTH_SHORT).show()
+})
 ```
 
-And use it like that
+Java
 
-```swift
-@objc func reloadContent(_ notification: Notification) {
-	// Reload the content
-}
+```java
+Purchasely.livePurchase().observe(this, product -> {
+    Log.d("Purchasely", "User purchased " + product);
+    Snackbar.make(findViewById(R.id.recyclerView), "Purchased " + product.getVendorId(), Snackbar.LENGTH_SHORT).show();
+});
 ```
 
 For example, this can be done in every controller that displays premium content. That way you won't have to reload the content each time the controller is displayed unless a payment was made
 
 ## 🎆 Promote your product
 
-### … inside your app
-
 Now everything is ready, you will want to advertise your In App Purchases from within your app to convert your users.
 You migh want to create banners, splash screens, … but doing it right is complex:
 * Your product is delivered in more than 150 countries and several currencies
-* Prices can change from store to store, this is not an equivalent, you can set different prices by country (cheaper in 🇫🇷, more expensive in 🇬🇧) and Apple changes its price grid regularly to fit rate or taxes changes
+* Prices can change from store to store, this is not an equivalent, you can set different prices by country (cheaper in 🇫🇷, more expensive in 🇬🇧) and Google changes its price grid regularly to fit rate or taxes changes
 * You must take into account the Locale of the user to place the currency at the right spot so that the user feels safe …
-* A phone with a `en-US` Locale doesn't mean the user has a US App Store account. You need to interrogate the App Store to get the user price, currency, …
+* A phone with a `en-US` Locale doesn't mean the user has a US Play Store account. You need to interrogate the Google Play Store to get the user price, currency, …
 * You must take into account introductory price information and display the promotion correctly ($10 / month during 3 months ). Remember periods can be weeks, months, … but even 3 days, 2 weeks and more when your intro pricing is free.
 
 We already did that job to display your products and plans and we know it is tough, so please don't try to hardcode the pricings, periods, …
 Instead you can use the services we have exposed to display the pricing.
 
-First you need to select which Plan of a product you want to expose (cheapest one ? most used ?), then you can proceed as following :
-
-```swift
-Purchasely.plan(with: "MONTHLY",
-				success: { (plan) in
-					// Get the regular price like "$1.99 / month"
-					guard let price = plan.localizedFullPrice else { return }
-
-					// In case there is an active promotion we display it followed by the regular price
-					// for example: "$0.99 / week during 2 weeks then $1.99 / month"
-					if plan.hasIntroductoryPrice,
-						let introPrice = plan.localizedFullIntroductoryPrice,
-						let introDuration = plan.localizedIntroductoryDuration {
-						self.priceLabel.text = "\(introPrice) during \(introDuration) then \(price)"
-					} else {
-						self.priceLabel.text = price
-					}
-},
-				failure: { (error) in
-					// Hide advertising
-})
+```kotlin
+Purchasely.getProducts(
+    onSuccess = { products ->
+    	//get all plans with pricing info
+	val plans = products.flatMap { it.plans })
+    },
+    onError = {
+	Toast.makeText(applicationContext, "Error ${it.message}", Toast.LENGTH_SHORT).show()
+    }
+)
 ```
+
+Java
+
+```java
+Purchasely.getProducts(new ProductsListener() {
+    @Override
+    public void onSuccess(@NotNull List<PLYProduct> list) {
+    	//list contains all your product, filter with the product id you want
+    	//get all plans with pricing info
+	List<PLYPlan> plans = new ArrayList<>();
+	for(int i = 0; i < list.size(); i++) {
+	    plans.addAll(list.get(i).getPlans());
+	}
+    }
+
+    @Override
+    public void onFailure(@NotNull Throwable throwable) {
+	Toast.makeText(getApplicationContext(), "Error " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+});
+```
+
 ## 🤕 Troubleshooting
 
 Having troubles ?
 You might find some answers by changing the log level :
 
-```swift
-Purchasely.start(withAPIKey: "API_KEY", logLevel: .debug)
-```
-
-or 
-
-```swift
-Purchasely.setLogLevel(.debug)
+```kotlin
+Purchasely.logLevel = LogLevel.Debug
 ```
 
 ## 👀 Example
