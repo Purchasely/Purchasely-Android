@@ -23,22 +23,20 @@
 
 #### Maven
 
-Add maven repository url to your build.gradle file
+Add our maven repository url to your project build.gradle file
 ```groovy
-repositories {
-    maven {
-        url = uri("https://maven.pkg.github.com/Purchasely/Purchasely-Android")
-        credentials {
-            username = "Purchasely"
-            password = "1fb5f10075362a24b1504f9a961447d5e8b115c9"
-        }
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url  "https://dl.bintray.com/purchasely/Purchasely" } //Add this line
     }
 }
 ```
 
 Add the sdk to your dependencies
 ```groovy
-implementation 'io.purchasely:purchasely:0.1.9'
+implementation 'io.purchasely:purchasely:0.2.3'
 ```
 
 ### Initialize the SDK
