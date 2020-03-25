@@ -2,16 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-repositories {
-    maven {
-        url = uri("https://maven.pkg.github.com/Purchasely/Purchasely-Android")
-        credentials {
-            username = "Purchasely"
-            password = "1fb5f10075362a24b1504f9a961447d5e8b115c9"
-        }
-    }
-}
-
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -55,7 +45,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
 
 
-    implementation 'io.purchasely:purchasely:0.1.9'
+    implementation 'io.purchasely:purchasely:0.2.3'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

@@ -8,11 +8,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.purchasely.ext.EventListener
+import io.purchasely.ext.PLYEvent
+import io.purchasely.ext.Purchasely
 import io.purchasely.models.PLYPlan
-import io.purchasely.public.EventListener
-import io.purchasely.public.PLYEvent
-import io.purchasely.public.PLYUI
-import io.purchasely.public.Purchasely
 import io.purchasely.sample.kotlin.FeatureListActivity
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.activity_main.*
@@ -115,7 +114,7 @@ class Holder(override val containerView: TextView) : RecyclerView.ViewHolder(con
             append("\n")
             append(String.format("Introductory Duration: %s", plan.localizedIntroductoryDuration()))
             append("\n")
-            append(String.format("Trial Period: %s", plan.localizedTrialPeriod()))
+            append(String.format("Trial Period: %s", plan.localizedTrialDuration()))
             append("\n")
             append(String.format("Numeric Price: %s", plan.getPrice()))
             append("\n")

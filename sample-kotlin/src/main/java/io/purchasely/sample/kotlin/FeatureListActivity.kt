@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
-import io.purchasely.public.Purchasely
+import io.purchasely.ext.Purchasely
 import io.purchasely.sample.kotlin.R
 import kotlinx.android.synthetic.main.activity_feature_list.*
 
