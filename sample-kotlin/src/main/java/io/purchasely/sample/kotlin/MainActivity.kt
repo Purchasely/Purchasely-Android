@@ -3,11 +3,14 @@ package io.purchasely.sample.kotlin
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.EventListener
 import io.purchasely.ext.PLYEvent
 import io.purchasely.ext.Purchasely
@@ -48,6 +51,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
         */
+
+        //Use LiveData to be notified when a purchase is made
+        Purchasely.livePurchase().observe(this, Observer {
+            Log.d("Purchasely", "User purchased $it")
+            Snackbar.make(recyclerView, "Purchased ${it?.vendorId}", Snackbar.LENGTH_SHORT).show()
+        })
     }
 
     private val eventListener = object: EventListener {

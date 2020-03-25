@@ -2,6 +2,7 @@ package io.purchasely.sample.java;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -12,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -63,6 +66,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
+
+        //Use LiveData to be notified when a purchase is made
+        Purchasely.livePurchase().observe(this, product -> {
+            Log.d("Purchasely", "User purchased " + product);
+            Snackbar.make(findViewById(R.id.recyclerView), "Purchased " + product.getVendorId(), Snackbar.LENGTH_SHORT).show();
+        });
 
         findViewById(R.id.buttonDisplayFeatureList).setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), FeatureListActivity.class)));
 
