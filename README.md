@@ -164,18 +164,14 @@ The SDK offers a way to display these using a standard `AlertDialog` message wit
 If you wish to offer a nicer way to display error messages, a way that reflects more your app, you can override by setting yourself as the listener (`UIListener`) you will then be responsible for displaying the messages yourself.
 
 ```kotlin
-Purchasely.uiListener = object : UIListener {
-    override fun onAlert(alert: PLYUI) {
+Purchasely.uiListener = object: UIListener {
+    override fun onAlert(alert: PLYAlertMessage) {
 	when(alert) {
-	    PLYUI.InAppSuccess -> TODO()
-	    PLYUI.InAppDeferred -> TODO()
-	    PLYUI.InAppSuccessUnauthentified -> TODO()
-	    PLYUI.InAppRestorationSuccess -> TODO()
-	    is PLYUI.InAppRestorationError -> TODO()
-	    is PLYUI.InAppError -> TODO()
+	    PLYAlertMessage.InAppSuccess -> displaySuccessDialog(alert)
+	    PLYAlertMessage.InAppSuccessUnauthentified -> displaySuccessDialog(alert)
+	    is PLYAlertMessage.InAppError -> displayErrorDialog(alert)
 	}
     }
-
 }
 ```
 
@@ -184,8 +180,8 @@ Or in Java
 ```java
 Purchasely.setUiListener(new UIListener() {
     @Override
-    public void onAlert(@NotNull PLYUI ui) {
-	if(ui instanceof PLYUI.InAppSuccess) {
+    public void onAlert(@NotNull PLYAlertMessage alert) {
+	if(alert instanceof PLYAlertMessage.InAppSuccess) {
 	    //TODO display success view
 	}
     }
@@ -290,6 +286,19 @@ Purchasely.getProducts(new ProductsListener() {
 	Toast.makeText(getApplicationContext(), "Error " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
 });
+```
+
+## 🔗 Open Link
+You may decide to add some links to you product in the presentation. When the user clicks on it, an activity webview is open.
+You may choose to not do that, in such case, do not add the Webview Acivivity to the manifest. Instead, listen to the PLYEvent `LinkOpened`, it contains the url to open.
+
+If you want the sdk to open the link in a webview, add the activity to your manfiest.
+
+```xml
+<!-- Purchasely WebView -->
+<activity
+    android:name="io.purchasely.views.PLYWebViewActivity"
+    android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 ```
 
 ## 🤕 Troubleshooting
