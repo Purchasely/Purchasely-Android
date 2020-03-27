@@ -1,5 +1,6 @@
 package io.purchasely.sample.kotlin
 
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,13 +8,12 @@ import android.util.Log
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import io.purchasely.ext.EventListener
-import io.purchasely.ext.PLYEvent
-import io.purchasely.ext.Purchasely
+import io.purchasely.ext.*
 import io.purchasely.models.PLYPlan
 import io.purchasely.sample.kotlin.FeatureListActivity
 import kotlinx.android.extensions.LayoutContainer
@@ -39,24 +39,56 @@ class MainActivity : AppCompatActivity() {
         //set your user id to bind the purchase or to restore it
         //Purchasely.userId = "My user id"
 
-        /*
-        Implement UI Listener to handle UI event that may appear to user (success and error dialog)
+
+        //Implement UI Listener to handle UI event that may appear to user (success and error dialog)
         Purchasely.uiListener = object: UIListener {
-            override fun onAlert(alert: PLYUI) {
+            override fun onAlert(alert: PLYAlertMessage) {
                 when(alert) {
-                    PLYUI.InAppSuccess -> //TODO do something
-                    PLYUI.InAppSuccessUnauthentified -> //TODO do something
-                    PLYUI.InAppError -> //TODO do something
+                    PLYAlertMessage.InAppSuccess -> displaySuccessDialog(alert)
+                    PLYAlertMessage.InAppSuccessUnauthentified -> displaySuccessDialog(alert)
+                    is PLYAlertMessage.InAppError -> displayErrorDialog(alert)
                 }
             }
         }
-        */
+
 
         //Use LiveData to be notified when a purchase is made
         Purchasely.livePurchase().observe(this, Observer {
             Log.d("Purchasely", "User purchased $it")
             Snackbar.make(recyclerView, "Purchased ${it?.vendorId}", Snackbar.LENGTH_SHORT).show()
         })
+    }
+
+    /**
+     * You can display your own view like a dialog to inform the user
+     * PLYAlertMessage contains some predefined string key translated in multiples languages that you can use if you want to
+     * As an example, the success title key is : ply_modal_alert_in_app_success_title
+     * All keys are in a values-{language}.xml file like values.xml for english or values-fr.xml for french
+     */
+    private fun displaySuccessDialog(alert: PLYAlertMessage) {
+        AlertDialog.Builder(this)
+                .setTitle(getString(alert.getTitleKey()))
+                .setMessage("Thank you for your purchase, enjoy our great content !!")
+                .setPositiveButton(getString(alert.getButtonKey())) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
+    }
+
+    /**
+     * For an error, PLYAlertMessage contains a dynamic content accessible with getContentMessage()
+     * You can display directly the error to the user if you want to
+     */
+    private fun displayErrorDialog(alert: PLYAlertMessage) {
+        AlertDialog.Builder(this)
+                .setTitle("Oups something not right happened")
+                .setMessage(alert.getContentMessage())
+                .setPositiveButton("Damn it !") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
     }
 
     private val eventListener = object: EventListener {

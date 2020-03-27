@@ -21,14 +21,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.purchasely.ext.LogLevel;
-import io.purchasely.ext.PLYUI;
 import io.purchasely.ext.ProductsListener;
 import io.purchasely.ext.Purchasely;
-import io.purchasely.ext.UIListener;
 import io.purchasely.models.PLYPlan;
 import io.purchasely.models.PLYProduct;
-import io.purchasely.sample.java.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,13 +55,14 @@ public class MainActivity extends AppCompatActivity {
         Implement UI Listener to handle UI event that may appear to user (success and error dialog)
         Purchasely.setUiListener(new UIListener() {
             @Override
-            public void onAlert(@NotNull PLYUI ui) {
-                if(ui instanceof PLYUI.InAppSuccess) {
+            public void onAlert(@NotNull PLYAlertMessage alert) {
+                if(alert instanceof PLYAlertMessage.InAppSuccess) {
                     //TODO display success view
                 }
             }
         });
         */
+
 
         //Use LiveData to be notified when a purchase is made
         Purchasely.livePurchase().observe(this, product -> {
