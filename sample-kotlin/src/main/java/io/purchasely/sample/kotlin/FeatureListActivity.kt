@@ -2,11 +2,13 @@ package io.purchasely.sample.kotlin
 
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
+import io.purchasely.ext.PLYAlertMessage
 import io.purchasely.ext.Purchasely
-import io.purchasely.sample.kotlin.R
+import io.purchasely.ext.UIListener
 import kotlinx.android.synthetic.main.activity_feature_list.*
 
 class FeatureListActivity : FragmentActivity() {
@@ -16,7 +18,7 @@ class FeatureListActivity : FragmentActivity() {
         setContentView(R.layout.activity_feature_list)
 
         //TODO set the product id you want to display
-        Purchasely.displayProduct(/*Your Product id*/ "",
+        Purchasely.displayProduct("YOUR_PRODUCT_ID",
             success = { fragment ->
                 supportFragmentManager.beginTransaction()
                     .addToBackStack(null)
@@ -26,16 +28,60 @@ class FeatureListActivity : FragmentActivity() {
                 progressBar.isVisible = false
             },
             failure = { error ->
-                Log.e("SinglePlan", "Error", error)
+                Log.e("FeatureList", "Error", error)
                 Snackbar.make(window.decorView, error.message ?: "error", Snackbar.LENGTH_SHORT).show()
             }
         )
+
+        //Implement UI Listener to handle UI event that may appear to user (success and error dialog)
+        Purchasely.uiListener = object: UIListener {
+            override fun onAlert(alert: PLYAlertMessage) {
+                when(alert) {
+                    PLYAlertMessage.InAppSuccess -> displaySuccessDialog(alert)
+                    PLYAlertMessage.InAppSuccessUnauthentified -> displaySuccessDialog(alert)
+                    is PLYAlertMessage.InAppError -> displayErrorDialog(alert)
+                    is PLYAlertMessage.InAppRestorationError -> displayErrorDialog(alert)
+                }
+            }
+        }
 
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount == 0) {
                 supportFinishAfterTransition()
             }
         }
+    }
+
+    /**
+     * You can display your own view like a dialog to inform the user
+     * PLYAlertMessage contains some predefined string key translated in multiples languages that you can use if you want to
+     * As an example, the success title key is : ply_modal_alert_in_app_success_title
+     * All keys are in a values-{language}.xml file like values.xml for english or values-fr.xml for french
+     */
+    private fun displaySuccessDialog(alert: PLYAlertMessage) {
+        AlertDialog.Builder(this)
+                .setTitle(getString(alert.getTitleKey()))
+                .setMessage("Thank you for your purchase, enjoy our great content !!")
+                .setPositiveButton(getString(alert.getButtonKey())) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
+    }
+
+    /**
+     * For an error, PLYAlertMessage contains a dynamic content accessible with getContentMessage()
+     * You can display directly the error to the user if you want to
+     */
+    private fun displayErrorDialog(alert: PLYAlertMessage) {
+        AlertDialog.Builder(this)
+                .setTitle("Oups something not right happened")
+                .setMessage(alert.getContentMessage())
+                .setPositiveButton("Damn it !") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
     }
 
 }
