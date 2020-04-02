@@ -44,7 +44,7 @@ implementation 'io.purchasely:purchasely:0.2.4'
 Iniatialize sdk when you want to have access to products, purchases or restoration. We advise you to do it as soon as your application start, our sdk is very light and all initialization process is done on another thread.
 
 ```kotlin
-import io.purchasely.public.Purchasely
+import io.purchasely.ext.Purchasely
 
 Purchasely.start(applicationContext, "API_KEY", "USER_ID", eventListener, uiListener)
 ```
