@@ -149,7 +149,7 @@ Some information messages are also displayed to the user during the purchase lif
 - Purchase completed
 - Restoration completed
 
-These alerts are listed in `PLYUI` enum. 
+These alerts are listed in `PLYAlertMessage` enum. 
 
 Many errors can occure during the purchase process and are embedded in these messages liek:
 - Network error
