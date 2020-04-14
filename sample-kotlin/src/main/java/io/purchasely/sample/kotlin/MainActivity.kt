@@ -41,12 +41,6 @@ class MainActivity : AppCompatActivity() {
         //set your user id to bind the purchase or to restore it
         //Purchasely.userId = "My user id"
 
-
-        //Use LiveData to be notified when a purchase is made
-        Purchasely.livePurchase().observe(this, Observer {
-            Log.d("Purchasely", "User purchased $it")
-            Snackbar.make(recyclerView, "Purchased ${it?.vendorId}", Snackbar.LENGTH_SHORT).show()
-        })
     }
 
     private val eventListener = object: EventListener {
@@ -54,7 +48,6 @@ class MainActivity : AppCompatActivity() {
             when(event) {
                 PLYEvent.InAppStarted -> getProducts()
                 PLYEvent.LoginTapped -> Toast.makeText(applicationContext, "User asked to login", Toast.LENGTH_LONG).show()
-                PLYEvent.InAppPurchasing -> Toast.makeText(applicationContext, "Running...", Toast.LENGTH_SHORT).show()
                 PLYEvent.InAppPurchased -> Toast.makeText(applicationContext, "Success !", Toast.LENGTH_SHORT).show()
                 is PLYEvent.ReceiptFailed -> Toast.makeText(applicationContext, "Receipt failed : ${event.error.message}", Toast.LENGTH_LONG).show()
                 PLYEvent.ReceiptValidated -> Toast.makeText(applicationContext, "Receipt validated", Toast.LENGTH_SHORT).show()

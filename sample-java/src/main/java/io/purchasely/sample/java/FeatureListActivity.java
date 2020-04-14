@@ -43,5 +43,11 @@ public class FeatureListActivity extends AppCompatActivity {
                 findViewById(R.id.progressBar).setVisibility(View.GONE);
             }
         });
+
+        //Use LiveData to be notified when a purchase is made
+        Purchasely.livePurchase().observe(this, product -> {
+            Log.d("Purchasely", "User purchased " + product);
+            Snackbar.make(getWindow().getDecorView(), "Purchased " + product.getVendorId(), Snackbar.LENGTH_SHORT).show();
+        });
     }
 }

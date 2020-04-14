@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.PLYAlertMessage
 import io.purchasely.ext.Purchasely
@@ -44,6 +45,12 @@ class FeatureListActivity : FragmentActivity() {
                 }
             }
         }
+
+        //Use LiveData to be notified when a purchase is made
+        Purchasely.livePurchase().observe(this, Observer {
+            Log.d("Purchasely", "User purchased $it")
+            Snackbar.make(window.decorView, "Purchased ${it?.vendorId}", Snackbar.LENGTH_SHORT).show()
+        })
 
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount == 0) {

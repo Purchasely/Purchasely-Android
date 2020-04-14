@@ -63,13 +63,6 @@ public class MainActivity extends AppCompatActivity {
         });
         */
 
-
-        //Use LiveData to be notified when a purchase is made
-        Purchasely.livePurchase().observe(this, product -> {
-            Log.d("Purchasely", "User purchased " + product);
-            Snackbar.make(findViewById(R.id.recyclerView), "Purchased " + product.getVendorId(), Snackbar.LENGTH_SHORT).show();
-        });
-
         findViewById(R.id.buttonDisplayFeatureList).setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), FeatureListActivity.class)));
 
         Purchasely.getProducts(new ProductsListener() {
@@ -120,13 +113,13 @@ public class MainActivity extends AppCompatActivity {
 
     static class Holder extends ViewHolder {
 
-        public Holder(@NonNull View itemView) {
+        Holder(@NonNull View itemView) {
             super(itemView);
         }
 
-        public void bind(PLYPlan plan) {
+        void bind(PLYPlan plan) {
             String productId = "";
-            if(plan.getStoreInformation().getStore_product_id() != null) {
+            if(plan.getStoreInformation() != null && plan.getStoreInformation().getStore_product_id() != null) {
                 productId = plan.getStoreInformation().getStore_product_id();
             }
             StringBuilder content = new StringBuilder();
