@@ -36,7 +36,7 @@ allprojects {
 
 Add the sdk to your dependencies
 ```groovy
-implementation 'io.purchasely:purchasely:0.4.2'
+implementation 'io.purchasely:purchasely:0.4.3'
 ```
 
 ### Initialize the SDK

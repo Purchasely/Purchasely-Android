@@ -45,7 +45,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
 
 
-    implementation 'io.purchasely:purchasely:0.4.2'
+    implementation 'io.purchasely:purchasely:0.4.3'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
