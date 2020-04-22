@@ -23,8 +23,7 @@
 
         <!-- Purchasely WebView -->
         <activity
-            android:name="io.purchasely.views.PLYWebViewActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:name="io.purchasely.views.PLYWebViewActivity" />
     </application>
 
 </manifest>

@@ -36,7 +36,7 @@ allprojects {
 
 Add the sdk to your dependencies
 ```groovy
-implementation 'io.purchasely:purchasely:0.4.3'
+implementation 'io.purchasely:purchasely:0.5.0'
 ```
 
 ### Initialize the SDK
@@ -296,9 +296,7 @@ If you want the sdk to open the link in a webview, add the activity to your manf
 
 ```xml
 <!-- Purchasely WebView -->
-<activity
-    android:name="io.purchasely.views.PLYWebViewActivity"
-    android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+<activity android:name="io.purchasely.views.PLYWebViewActivity" />
 ```
 
 ## 🤕 Troubleshooting
