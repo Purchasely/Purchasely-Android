@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             when(event) {
                 PLYEvent.InAppStarted -> getProducts()
                 PLYEvent.LoginTapped -> Toast.makeText(applicationContext, "User asked to login", Toast.LENGTH_LONG).show()
-                PLYEvent.InAppPurchased -> Toast.makeText(applicationContext, "Success !", Toast.LENGTH_SHORT).show()
+                is PLYEvent.InAppPurchased -> Toast.makeText(applicationContext, "Success !", Toast.LENGTH_SHORT).show()
                 is PLYEvent.ReceiptFailed -> Toast.makeText(applicationContext, "Receipt failed : ${event.error.message}", Toast.LENGTH_LONG).show()
                 PLYEvent.ReceiptValidated -> Toast.makeText(applicationContext, "Receipt validated", Toast.LENGTH_SHORT).show()
                 PLYEvent.RestoreStarted -> Toast.makeText(applicationContext, "Click on restore", Toast.LENGTH_SHORT).show()
@@ -110,7 +110,7 @@ class Holder(override val containerView: TextView) : RecyclerView.ViewHolder(con
             append("\n")
             append(String.format("Numeric Price: %s", plan.getPrice()))
             append("\n")
-            append(String.format("Price Currency Code: %s", plan.getPriceCurrencyCode()))
+            append(String.format("Price Currency Symbol: %s", plan.getPriceCurrencySymbol()))
             append("\n")
             append(String.format("Daily Equivalent: %s", plan.dailyEquivalentPrice()))
             append("\n")

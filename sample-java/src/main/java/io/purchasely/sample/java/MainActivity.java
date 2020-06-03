@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             content.append("\n");
             content.append(String.format("Numeric Price: %s", plan.getPrice()));
             content.append("\n");
-            content.append(String.format("Price Currency Code: %s", plan.getPriceCurrencyCode()));
+            content.append(String.format("Price Currency Symbol: %s", plan.getPriceCurrencySymbol()));
             content.append("\n");
             content.append(String.format("Daily Equivalent: %s", plan.dailyEquivalentPrice()));
             content.append("\n");
