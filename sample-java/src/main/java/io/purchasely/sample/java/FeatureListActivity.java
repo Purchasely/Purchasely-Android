@@ -22,7 +22,8 @@ public class FeatureListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feature_list);
 
-        Purchasely.displayProduct("YOUR_PRODUCT_ID", new DisplayProductListener() {
+        //TODO set the product id you want to display
+        Purchasely.displayProduct("YOUR_PRODUCT_ID", "default", new DisplayProductListener() {
             @Override
             public void onFailure(@NotNull Throwable throwable) {
                 Log.e("SinglePlan", "Error", throwable);

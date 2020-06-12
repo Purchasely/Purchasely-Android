@@ -36,7 +36,7 @@ allprojects {
 
 Add the sdk to your dependencies
 ```groovy
-implementation 'io.purchasely:purchasely:0.7.1'
+implementation 'io.purchasely:purchasely:0.7.2'
 ```
 
 ### Initialize the SDK
@@ -81,7 +81,9 @@ Purchasely handles all the presentation logic of your products configured in the
 You can ask for the SDK to give you the `androidx.fragment.app.Fragment` presenting the purchase by calling the following :
 
 ```kotlin
-Purchasely.displayProduct(/*Your Product id*/ "",
+Purchasely.displayProduct(
+    productId = /*Your Product id*/ "",
+    presentationId = "default" //change to set the presentation you want to display
     success = { fragment ->
 	supportFragmentManager.beginTransaction()
 	    .addToBackStack(null)
@@ -96,12 +98,12 @@ Purchasely.displayProduct(/*Your Product id*/ "",
     }
 )
 ```
-A coroutine version also exists `suspend fun displayProduct(productId: String) : Fragment?`
+A coroutine version also exists `suspend fun displayProduct(productId: String, presentationId: String) : Fragment?`
 
 Or in Java
 
 ```java
-Purchasely.displayProduct("YOUR_PRODUCT_ID", new DisplayProductListener() {
+Purchasely.displayProduct("YOUR_PRODUCT_ID", "default", new DisplayProductListener() {
     @Override
     public void onFailure(@NotNull Throwable throwable) {
 	Log.e("Product", "Error", throwable);
