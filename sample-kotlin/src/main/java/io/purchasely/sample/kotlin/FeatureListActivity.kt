@@ -19,7 +19,7 @@ class FeatureListActivity : FragmentActivity() {
         setContentView(R.layout.activity_feature_list)
 
         //TODO set the product id you want to display
-        Purchasely.displayProduct(
+        Purchasely.productFragment(
             productId = "YOUR_PRODUCT_ID",
             presentationId = "default",
             success = { fragment ->
