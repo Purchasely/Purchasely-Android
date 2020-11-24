@@ -84,6 +84,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Purchasely.close();
+    }
+
     static class Adapter extends RecyclerView.Adapter<Holder> {
 
         List<PLYPlan> list = new ArrayList<>();
@@ -118,12 +124,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         void bind(PLYPlan plan) {
-            String productId = "";
-            if(plan.getStoreInformation() != null && plan.getStoreInformation().getStore_product_id() != null) {
-                productId = plan.getStoreInformation().getStore_product_id();
-            }
             StringBuilder content = new StringBuilder();
-            content.append(productId);
+            content.append(plan.getStore_product_id());
             content.append("\n");
             content.append(String.format("Full Price: %s", plan.localizedFullPrice()));
             content.append("\n");

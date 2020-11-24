@@ -69,6 +69,11 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        Purchasely.close()
+    }
+
 }
 
 class Adapter(val list: MutableList<PLYPlan> = mutableListOf()) : RecyclerView.Adapter<Holder>() {
@@ -90,7 +95,7 @@ class Holder(override val containerView: TextView) : RecyclerView.ViewHolder(con
 
     fun bind(plan: PLYPlan) {
         containerView.text = buildString {
-            append(plan.storeInformation?.store_product_id)
+            append(plan.store_product_id)
             append("\n")
             append(String.format("Full Price: %s", plan.localizedFullPrice()))
             append("\n")

@@ -36,7 +36,7 @@ allprojects {
 
 Add the sdk to your dependencies
 ```groovy
-implementation 'io.purchasely:purchasely:1.1.0'
+implementation 'io.purchasely:purchasely:2.0.0'
 ```
 
 ### Initialize the SDK
@@ -54,6 +54,15 @@ The `userId` parameter is optional and allows you to associate the purchase to a
 The `eventListener` parameter is optional and allows you to listen to all purchase events. You should implement it at least to know when the purchase is successfull.
 
 The `uiListener` parameter is optional and allows you to override UI dialog presented to user in case of error or success.
+
+If you are using listeners, it is important to close the sdk when you do not need purchasely to remove all references to your activity. For example :
+```kotlin
+override fun onDestroy() {
+    Purchasely.close()
+    super.onDestroy()
+}
+```
+You do not need to call that method if you are not using listeners or not referencing your activity directly.
 
 ### Setup User Id
 
@@ -81,54 +90,110 @@ Purchasely handles all the presentation logic of your products configured in the
 You can ask for the SDK to give you the `androidx.fragment.app.Fragment` presenting the purchase by calling the following :
 
 ```kotlin
-Purchasely.displayProduct(
+Purchasely.productFragment(
     productId = /*Your Product id*/ "",
     presentationId = "default" //change to set the presentation you want to display
-    success = { fragment ->
-	supportFragmentManager.beginTransaction()
-	    .addToBackStack(null)
+) { result, plan ->
+    /* You can set a callback to know when your user purchased a product */
+    when(result) {
+        PLYProductViewResult.PURCHASED -> Log.d("Purchasely", "Purchased $plan")
+        PLYProductViewResult.CANCELLED ->  Log.d("Purchasely", "Cancelled purchase of $plan")
+        PLYProductViewResult.RESTORED -> Log.d("Purchasely", "Restored $plan")
+    }
+}
+
+supportFragmentManager.beginTransaction()
+	    .addToBackStack(null) //optional
 	    .replace(R.id.inappFragment, fragment, "InAppFragment")
 	    .commitAllowingStateLoss()
-
-	progressBar.isVisible = false
-    },
-    failure = { error ->
-	Log.e("Product", "Error", error)
-	Snackbar.make(window.decorView, error.message ?: "error", Snackbar.LENGTH_SHORT).show()
-    }
-)
 ```
-A coroutine version also exists `suspend fun displayProduct(productId: String, presentationId: String) : Fragment?`
 
 Or in Java
 
 ```java
-Purchasely.displayProduct("YOUR_PRODUCT_ID", "default", new DisplayProductListener() {
+Fragment fragment = Purchasely.productFragment(/*Your Product id*/, /*Your Presentation id*/, new ProductViewResultListener() {
     @Override
-    public void onFailure(@NotNull Throwable throwable) {
-	Log.e("Product", "Error", throwable);
-	String message = "error";
-	if(throwable.getMessage() != null) {
-	    message = throwable.getMessage();
-	}
-	Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onSuccess(@NotNull Fragment fragment) {
-	getSupportFragmentManager().beginTransaction()
-		.addToBackStack(null)
-		.replace(R.id.inappFragment, fragment, "InAppFragment")
-		.commitAllowingStateLoss();
-
-	findViewById(R.id.progressBar).setVisibility(View.GONE);
+    public void onResult(@NotNull PLYProductViewResult result, @Nullable PLYPlan plan) {
+    /* You can set a callback to know when your user purchased a product */
+        switch (result) {
+            case PURCHASED:
+                break;
+            case CANCELLED:
+                break;
+            case RESTORED:
+                break;
+        }
     }
 });
+
+getSupportFragmentManager().beginTransaction()
+        .addToBackStack(null)
+        .replace(R.id.inappFragment, fragment, "InAppFragment")
+        .commitAllowingStateLoss();
 ```
 
 You can place the fragment wherever your want in another fragment or activity.
+The callback ProductViewResultListener is optional, you can set to null if you do not need it.
 
-You can be alerted if the purchase was made by listening to the LiveData `livePurchase()`
+You can also be alerted if the purchase was made by listening to the LiveData `livePurchase()`
+
+## Purchase products
+You can purchase a product without Purchasely UI if you wish to. First you need to retrieve all products available for purchase, then you can call the method to purchase a plan.
+```kotlin
+Purchasely.getProducts(
+    onSuccess = { products ->
+        //Get whatever plan you want, here we take the first one as an example
+        val plan = products.flatMap { it.plans }.first()
+        //Use livedata wih getPurchaseStateLiveData() if possible, otherwise you can create an instance of PurchaseListener
+        Purchasely.purchase(this@MainActivity, plan, object: PurchaseListener {
+            override fun onPurchaseStateChanged(state: State) {}
+        }
+    },
+    onError = {
+        Toast.makeText(applicationContext, "Error ${it.message}", Toast.LENGTH_SHORT).show()
+    }
+)
+```
+
+**Purchase state live data**
+
+The preferred way to get purchase state is to listen to purchase state livedata so that it is linked to your fragment or activity lifecycle.
+```kotlin
+Purchasely.getPurchaseStateLiveData().observe(viewLifecycleOwner) { state -> 
+    when(state) {
+        State.Setup -> Log.d("Purchasely", "Sotre is connected, we are ready to initiate a purchase")
+        State.NotAvailable -> Log.d("Purchasely", "Store is not available")
+        State.Disconnected -> Log.d("Purchasely", "Store is disconnected")
+        is State.ValidatePurchase -> Log.d("Purchasely", "Purchase has been made from store, we are sending it to our server for validation")
+        State.PurchaseDeferred -> Log.d("Purchasely", "Purchase has been processed but not validated by our server. The server will continue to try to validate it")
+        is State.Error -> Log.d("Purchasely", "An error in purchase process has occured : ${state.error}")
+        State.AlreadyPurchased -> Log.d("Purchasely", "Product has already been purchased by user. Maybe we should called restore function to retrieve it")
+        is State.ConsumedError -> Log.d("Purchasely", "Error to consume a consumable product from store with code ${state.errorCode}")
+        is State.RestorationFailed -> Log.d("Purchasely", "Restoration of product failed with error ${state.error}")
+        is State.PurchaseFailed -> Log.d("Purchasely", "Purchase of product failed with error ${state.error}")
+        is State.RestorePurchases -> Log.d("Purchasely", "Checking store to find products to restore")
+        State.RestorationNoProducts -> Log.d("Purchasely", "No products found to restore")
+        is State.PurchaseComplete -> Log.d("Purchasely", "Purchase is complete, user has received product")
+        is State.RestorationComplete -> Log.d("Purchasely", "Restoration is complete, user has received all previously purchased products")
+    }
+}
+```
+
+If you are not using LiveData in your application, you can add a purchase listener to get all states of purchase process or add it wherever you want directly with
+```kotlin
+Purchasely.purchaseListener = object: PurchaseListener {
+    override fun onPurchaseStateChanged(state: State) {}
+}
+```
+
+
+### Restore purchases
+You can also ask to restore all previously purchased products of user.
+```kotlin
+Purchasely.restorePurchases(object: PurchaseListener {
+    override fun onPurchaseStateChanged(state: State) {}
+)
+```
 
 ## 📈 Integrate In App events to your analytics system
 
@@ -168,11 +233,11 @@ If you wish to offer a nicer way to display error messages, a way that reflects 
 ```kotlin
 Purchasely.uiListener = object: UIListener {
     override fun onAlert(alert: PLYAlertMessage) {
-	when(alert) {
-	    PLYAlertMessage.InAppSuccess -> displaySuccessDialog(alert)
-	    PLYAlertMessage.InAppSuccessUnauthentified -> displaySuccessDialog(alert)
-	    is PLYAlertMessage.InAppError -> displayErrorDialog(alert)
-	}
+    	when(alert) {
+    	    PLYAlertMessage.InAppSuccess -> displaySuccessDialog(alert)
+    	    PLYAlertMessage.InAppSuccessUnauthentified -> displaySuccessDialog(alert)
+    	    is PLYAlertMessage.InAppError -> displayErrorDialog(alert)
+    	}
     }
 }
 ```
@@ -183,9 +248,9 @@ Or in Java
 Purchasely.setUiListener(new UIListener() {
     @Override
     public void onAlert(@NotNull PLYAlertMessage alert) {
-	if(alert instanceof PLYAlertMessage.InAppSuccess) {
-	    //TODO display success view
-	}
+    	if(alert instanceof PLYAlertMessage.InAppSuccess) {
+    	    //TODO display success view
+    	}
     }
 });
 ```
@@ -244,6 +309,8 @@ Purchasely.livePurchase().observe(this, product -> {
 
 For example, this can be done in every controller that displays premium content. That way you won't have to reload the content each time the controller is displayed unless a payment was made
 
+**Note** You do not need this live purchase if you are using the purchase state live data to get all states with `Purchasely.getPurchaseStateLiveData()`
+
 ## 🎆 Promote your product
 
 Now everything is ready, you will want to advertise your In App Purchases from within your app to convert your users.
@@ -261,10 +328,10 @@ Instead you can use the services we have exposed to display the pricing.
 Purchasely.getProducts(
     onSuccess = { products ->
     	//get all plans with pricing info
-	val plans = products.flatMap { it.plans })
+	    val plans = products.flatMap { it.plans })
     },
     onError = {
-	Toast.makeText(applicationContext, "Error ${it.message}", Toast.LENGTH_SHORT).show()
+	    Toast.makeText(applicationContext, "Error ${it.message}", Toast.LENGTH_SHORT).show()
     }
 )
 ```
@@ -277,29 +344,44 @@ Purchasely.getProducts(new ProductsListener() {
     public void onSuccess(@NotNull List<PLYProduct> list) {
     	//list contains all your product, filter with the product id you want
     	//get all plans with pricing info
-	List<PLYPlan> plans = new ArrayList<>();
-	for(int i = 0; i < list.size(); i++) {
-	    plans.addAll(list.get(i).getPlans());
-	}
+    	List<PLYPlan> plans = new ArrayList<>();
+    	for(int i = 0; i < list.size(); i++) {
+    	    plans.addAll(list.get(i).getPlans());
+    	}
     }
 
     @Override
     public void onFailure(@NotNull Throwable throwable) {
-	Toast.makeText(getApplicationContext(), "Error " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+	    Toast.makeText(getApplicationContext(), "Error " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
 });
 ```
 
+## 🧾 Display your subscriptions
+
+We believe that your customers should be able to unsubscribe as easily as they subscribed. This leads to a better global trust and offers some interesting opportunities like offering an upsell or downsell or getting to know why they choose unsubscribe.
+
+We provide a complete active subscriptions handling flow that you can call with a single line of code and that offers:
+* Active subscriptions list
+* Next renewal date
+* Upsell / downsell
+* Cancellation survey
+* Cancellation
+
+You can get the subscriptions fragment that handles everthings just by instantiating it : `PLYSubscriptionsFragment()`
+
+```kotlin
+supportFragmentManager.beginTransaction()
+    .addToBackStack(null)
+    .replace(R.id.fragment, PLYSubscriptionsFragment(), "SubscriptionsFragment")
+    .commit()
+```
+
+⚠️ The controller must be added to a `UINavigationController`.
+
 ## 🔗 Open Link
 You may decide to add some links to you product in the presentation. When the user clicks on it, an activity webview is open.
 You may choose to not do that, in such case, do not add the Webview Acivivity to the manifest. Instead, listen to the PLYEvent `LinkOpened`, it contains the url to open.
-
-If you want the sdk to open the link in a webview, add the activity to your manfiest.
-
-```xml
-<!-- Purchasely WebView -->
-<activity android:name="io.purchasely.views.PLYWebViewActivity" />
-```
 
 ## 🤕 Troubleshooting
 

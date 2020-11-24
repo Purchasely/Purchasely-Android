@@ -19,22 +19,23 @@ class FeatureListActivity : FragmentActivity() {
         setContentView(R.layout.activity_feature_list)
 
         //TODO set the product id you want to display
-        Purchasely.productFragment(
-            productId = "YOUR_PRODUCT_ID",
-            presentationId = "default",
-            success = { fragment ->
-                supportFragmentManager.beginTransaction()
-                    .addToBackStack(null)
-                    .replace(R.id.inappFragment, fragment, "InAppFragment")
-                    .commitAllowingStateLoss()
+        val fragment = Purchasely.productFragment(
+                productId = "YOUR_PRODUCT_ID",
+                presentationId = "default", ) { result, plan ->
+            Snackbar.make(
+                        window.decorView,
+                        "Purchased result is $result with plan ${plan?.vendorId}",
+                        Snackbar.LENGTH_LONG
+                    )
+                    .show()
+        }
 
-                progressBar.isVisible = false
-            },
-            failure = { error ->
-                Log.e("FeatureList", "Error", error)
-                Snackbar.make(window.decorView, error.message ?: "error", Snackbar.LENGTH_SHORT).show()
-            }
-        )
+        supportFragmentManager.beginTransaction()
+                .addToBackStack(null)
+                .replace(R.id.inappFragment, fragment, "InAppFragment")
+                .commitAllowingStateLoss()
+
+        progressBar.isVisible = false
 
         //Implement UI Listener to handle UI event that may appear to user (success and error dialog)
         Purchasely.uiListener = object: UIListener {
