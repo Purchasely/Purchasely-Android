@@ -39,7 +39,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
 
     //Purchasely
-    implementation 'io.purchasely:purchasely:2.0.0'
+    implementation 'io.purchasely:purchasely:2.0.1'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
