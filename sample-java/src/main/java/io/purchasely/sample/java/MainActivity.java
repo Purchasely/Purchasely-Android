@@ -2,7 +2,6 @@ package io.purchasely.sample.java;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -12,21 +11,24 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.purchasely.billing.Store;
+import io.purchasely.ext.EventListener;
+import io.purchasely.ext.LogLevel;
+import io.purchasely.ext.PLYEvent;
 import io.purchasely.ext.ProductsListener;
 import io.purchasely.ext.Purchasely;
+import io.purchasely.google.GoogleStore;
 import io.purchasely.models.PLYPlan;
 import io.purchasely.models.PLYProduct;
+import io.purchasely.sample.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EventListener {
 
     private Adapter adapter = null;
 
@@ -43,25 +45,19 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setAdapter(adapter);
 
-        Purchasely.start(getApplicationContext(), "YOUR_API_KEY", "YOUR_USER_ID", null, null);
+        List<Store> stores = new ArrayList<>();
+        stores.add(new GoogleStore());
 
-        //set your user id to bind the purchase or to restore it
-        //Purchasely.setUserId("");
+        new Purchasely.Builder(getApplicationContext())
+                //TODO set your api key
+                .apiKey("afa96c76-1d8e-4e3c-a48f-204a3cd93a15")
+                .eventListener(this)
+                .logLevel(LogLevel.DEBUG)
+                .isReadyToPurchase(true)
+                .stores(stores)
+                .build();
 
-        //set log level for debugging
-        //Purchasely.setLogLevel(LogLevel.DEBUG);
-
-        /*
-        Implement UI Listener to handle UI event that may appear to user (success and error dialog)
-        Purchasely.setUiListener(new UIListener() {
-            @Override
-            public void onAlert(@NotNull PLYAlertMessage alert) {
-                if(alert instanceof PLYAlertMessage.InAppSuccess) {
-                    //TODO display success view
-                }
-            }
-        });
-        */
+        Purchasely.start();
 
         findViewById(R.id.buttonDisplayFeatureList).setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), FeatureListActivity.class)));
 
@@ -88,6 +84,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Purchasely.close();
+    }
+
+    @Override
+    public void onEvent(@NotNull PLYEvent plyEvent) {
+
     }
 
     static class Adapter extends RecyclerView.Adapter<Holder> {
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    static class Holder extends ViewHolder {
+    static class Holder extends RecyclerView.ViewHolder {
 
         Holder(@NonNull View itemView) {
             super(itemView);

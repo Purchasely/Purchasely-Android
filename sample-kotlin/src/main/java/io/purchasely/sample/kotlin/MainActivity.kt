@@ -2,20 +2,20 @@ package io.purchasely.sample.kotlin
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.EventListener
 import io.purchasely.ext.LogLevel
 import io.purchasely.ext.PLYEvent
 import io.purchasely.ext.Purchasely
+import io.purchasely.google.GoogleStore
+import io.purchasely.huawei.HuaweiStore
 import io.purchasely.models.PLYPlan
+import io.purchasely.sample.R
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -31,15 +31,23 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(applicationContext)
         recyclerView.adapter = adapter
 
-        //TODO set your api key
-        Purchasely.start(applicationContext, "YOUR_API_KEY", eventListener = eventListener)
-
-        Purchasely.logLevel = LogLevel.DEBUG
+        Purchasely.Builder(applicationContext)
+                //TODO set your api key
+                .apiKey("afa96c76-1d8e-4e3c-a48f-204a3cd93a15")
+                .eventListener(eventListener)
+                .logLevel(LogLevel.VERBOSE)
+                .isReadyToPurchase(true)
+                .stores(listOf(HuaweiStore()))
+                .build()
+                .start()
 
         buttonDisplayFeatureList.setOnClickListener { startActivity(Intent(applicationContext, FeatureListActivity::class.java)) }
+        buttonSubscriptions.setOnClickListener { startActivity(Intent(applicationContext, SubscriptionsActivity::class.java)) }
 
         //set your user id to bind the purchase or to restore it
         //Purchasely.userId = "My user id"
+
+        getProducts()
 
     }
 
@@ -94,6 +102,7 @@ class Adapter(val list: MutableList<PLYPlan> = mutableListOf()) : RecyclerView.A
 class Holder(override val containerView: TextView) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     fun bind(plan: PLYPlan) {
+        containerView.text = plan.toString()
         containerView.text = buildString {
             append(plan.store_product_id)
             append("\n")

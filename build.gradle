@@ -3,16 +3,18 @@
 buildscript {
     
     ext {
-        kotlin_version = '1.4.20'
+        kotlin_version = '1.4.21'
     }
     repositories {
         google()
         jcenter()
+        maven {url 'https://developer.huawei.com/repo/'}
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.huawei.agconnect:agcp:1.4.1.300'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -23,6 +25,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {url 'https://developer.huawei.com/repo/'}
         maven {
             url  "https://dl.bintray.com/purchasely/Purchasely"
         }

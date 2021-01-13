@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.PLYAlertMessage
+import io.purchasely.ext.PLYUIFragmentType
 import io.purchasely.ext.Purchasely
 import io.purchasely.ext.UIListener
+import io.purchasely.sample.R
 import kotlinx.android.synthetic.main.activity_feature_list.*
 
 class FeatureListActivity : FragmentActivity() {
@@ -20,7 +23,7 @@ class FeatureListActivity : FragmentActivity() {
 
         //TODO set the product id you want to display
         val fragment = Purchasely.productFragment(
-                productId = "YOUR_PRODUCT_ID",
+                productId = "PURCHASELY_PLUS",
                 presentationId = "default", ) { result, plan ->
             Snackbar.make(
                         window.decorView,
@@ -47,6 +50,11 @@ class FeatureListActivity : FragmentActivity() {
                     is PLYAlertMessage.InAppRestorationError -> displayErrorDialog(alert)
                 }
             }
+
+            override fun onFragment(fragment: Fragment, type: PLYUIFragmentType) {
+                TODO()
+                //display fragment coming from deeplink
+            }
         }
 
         //Use LiveData to be notified when a purchase is made
@@ -60,6 +68,11 @@ class FeatureListActivity : FragmentActivity() {
                 supportFinishAfterTransition()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Purchasely.uiListener = null
     }
 
     /**
@@ -85,9 +98,9 @@ class FeatureListActivity : FragmentActivity() {
      */
     private fun displayErrorDialog(alert: PLYAlertMessage) {
         AlertDialog.Builder(this)
-                .setTitle("Oups something not right happened")
+                .setTitle("Error")
                 .setMessage(alert.getContentMessage())
-                .setPositiveButton("Damn it !") { dialog, _ ->
+                .setPositiveButton("Ok") { dialog, _ ->
                     dialog.dismiss()
                 }
                 .create()
