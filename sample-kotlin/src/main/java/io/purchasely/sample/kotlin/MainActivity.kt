@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
                 .eventListener(eventListener)
                 .logLevel(LogLevel.DEBUG)
                 .isReadyToPurchase(true)
-                .stores(listOf(HuaweiStore()))
+                .stores(listOf(GoogleStore()))
                 .build()
                 .start()
 

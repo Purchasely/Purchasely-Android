@@ -22,9 +22,7 @@ class FeatureListActivity : FragmentActivity() {
         setContentView(R.layout.activity_feature_list)
 
         //TODO set the product id you want to display
-        val fragment = Purchasely.productFragment(
-                productId = "PURCHASELY_PLUS",
-                presentationId = "default", ) { result, plan ->
+        val fragment = Purchasely.presentationFragment(null) { result, plan ->
             Snackbar.make(
                         window.decorView,
                         "Purchased result is $result with plan ${plan?.vendorId}",

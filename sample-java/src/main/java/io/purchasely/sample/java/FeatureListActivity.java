@@ -25,8 +25,7 @@ public class FeatureListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_feature_list);
 
         //TODO set the product id you want to display
-        Fragment fragment = Purchasely.productFragment(
-                "PURCHASELY_PLUS", //Product Id
+        Fragment fragment = Purchasely.presentationFragment(
                 null, //Presentation Id, may be null for default
                 (plyProductViewResult, plyPlan) -> {
             String vendorId = plyPlan.getVendorId();
