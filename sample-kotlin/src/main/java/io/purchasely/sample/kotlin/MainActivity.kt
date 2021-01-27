@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
                 //TODO set your api key
                 .apiKey("afa96c76-1d8e-4e3c-a48f-204a3cd93a15")
                 .eventListener(eventListener)
-                .logLevel(LogLevel.VERBOSE)
+                .logLevel(LogLevel.DEBUG)
                 .isReadyToPurchase(true)
                 .stores(listOf(HuaweiStore()))
                 .build()
