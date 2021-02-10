@@ -21,7 +21,6 @@ class FeatureListActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
-        //TODO set the product id you want to display
         val fragment = Purchasely.presentationFragment(null) { result, plan ->
             Snackbar.make(
                         window.decorView,
@@ -30,6 +29,10 @@ class FeatureListActivity : FragmentActivity() {
                     )
                     .show()
         }
+
+        //You can also display the presentation for a specific product or plan
+        //Purchasely.productFragment("productId", "presentationId or null for default")
+        //Purchasely.planFragment("planId", "presentationId or null for default")
 
         supportFragmentManager.beginTransaction()
                 .addToBackStack(null)
