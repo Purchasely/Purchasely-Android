@@ -2,16 +2,19 @@ package io.purchasely.sample.kotlin
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
-import io.purchasely.ext.PLYAlertMessage
-import io.purchasely.ext.PLYUIFragmentType
-import io.purchasely.ext.Purchasely
-import io.purchasely.ext.UIListener
+import io.purchasely.ext.*
 import io.purchasely.sample.R
 import kotlinx.android.synthetic.main.activity_feature_list.*
 
@@ -21,13 +24,11 @@ class FeatureListActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
-        val fragment = Purchasely.presentationFragment(null) { result, plan ->
-            Snackbar.make(
-                        window.decorView,
-                        "Purchased result is $result with plan ${plan?.vendorId}",
-                        Snackbar.LENGTH_LONG
-                    )
-                    .show()
+        Purchasely.setConfirmPurchaseHandler(purchaseHandler)
+
+        val fragment = Purchasely.presentationFragment(
+                presentationId = null) { result, plan ->
+            Log.d("PurchaselyDemo", "Purchased result is $result with plan ${plan?.vendorId}")
         }
 
         //You can also display the presentation for a specific product or plan
@@ -42,7 +43,7 @@ class FeatureListActivity : FragmentActivity() {
         progressBar.isVisible = false
 
         //Implement UI Listener to handle UI event that may appear to user (success and error dialog)
-        Purchasely.uiListener = object: UIListener {
+        /*Purchasely.uiListener = object: UIListener {
             override fun onAlert(alert: PLYAlertMessage) {
                 when(alert) {
                     PLYAlertMessage.InAppSuccess -> displaySuccessDialog(alert)
@@ -53,16 +54,15 @@ class FeatureListActivity : FragmentActivity() {
             }
 
             override fun onFragment(fragment: Fragment, type: PLYUIFragmentType) {
-                TODO()
                 //display fragment coming from deeplink
             }
-        }
+        }*/
 
-        //Use LiveData to be notified when a purchase is made
-        Purchasely.livePurchase().observe(this, Observer {
-            Log.d("Purchasely", "User purchased $it")
+        //You can use LiveData to be notified when a purchase is made
+        Purchasely.livePurchase().observe(this) {
+            Log.d("Purchasely", "User purchased product $it")
             Snackbar.make(window.decorView, "Purchased ${it?.vendorId}", Snackbar.LENGTH_SHORT).show()
-        })
+        }
 
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount == 0) {
@@ -106,6 +106,58 @@ class FeatureListActivity : FragmentActivity() {
                 }
                 .create()
                 .show()
+    }
+
+    /**
+     * Before displaying purchase view, you can display you own content
+     * and send back a boolean to result callback
+     * true if you allow the user to continue with his purchase
+     * false otherwise
+     */
+    private val purchaseHandler: PurchaseCompletionHandler = { activity, processToPayment ->
+        //display an alert dialog
+        AlertDialog.Builder(this)
+                .setTitle("Do you agree with our terms and conditions ?")
+                .setPositiveButton("I agree") { dialog, _ ->
+                    processToPayment(true)
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    processToPayment(false)
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
+
+        //or display a fragment
+        /*
+        supportFragmentManager.beginTransaction()
+                .addToBackStack(null)
+                .add(R.id.inappFragment, LegalFragment(result), "InAppFragment")
+                .commitAllowingStateLoss()
+         */
+    }
+
+}
+
+class LegalFragment(val callback: ProcessToPaymentHandler) : Fragment() {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.fragment_legal, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        view.findViewById<Button>(R.id.buttonAgree).setOnClickListener {
+            callback(true)
+            parentFragmentManager.popBackStack()
+        }
+
+        view.findViewById<Button>(R.id.buttonCancel).setOnClickListener {
+            callback(false)
+            parentFragmentManager.popBackStack()
+        }
     }
 
 }

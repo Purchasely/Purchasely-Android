@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.billingclient.api.Purchase
 import io.purchasely.ext.EventListener
 import io.purchasely.ext.LogLevel
 import io.purchasely.ext.PLYEvent
@@ -44,23 +45,21 @@ class MainActivity : AppCompatActivity() {
         buttonDisplayFeatureList.setOnClickListener { startActivity(Intent(applicationContext, FeatureListActivity::class.java)) }
         buttonSubscriptions.setOnClickListener { startActivity(Intent(applicationContext, SubscriptionsActivity::class.java)) }
 
-        //set your user id to bind the purchase or to restore it
-        //Purchasely.userId = "My user id"
-
         getProducts()
+
+        Purchasely.userLogin("DEMO_USER") { refresh ->
+            if(refresh) {
+                //Purchases were transferred to the user, you may need to refresh your user information
+            }
+        }
 
     }
 
     private val eventListener = object: EventListener {
         override fun onEvent(event: PLYEvent) {
             when(event) {
-                PLYEvent.InAppStarted -> getProducts()
+                PLYEvent.AppStarted -> getProducts()
                 PLYEvent.LoginTapped -> Toast.makeText(applicationContext, "User asked to login", Toast.LENGTH_LONG).show()
-                is PLYEvent.InAppPurchased -> Toast.makeText(applicationContext, "Success !", Toast.LENGTH_SHORT).show()
-                is PLYEvent.ReceiptFailed -> Toast.makeText(applicationContext, "Receipt failed : ${event.error.message}", Toast.LENGTH_LONG).show()
-                PLYEvent.ReceiptValidated -> Toast.makeText(applicationContext, "Receipt validated", Toast.LENGTH_SHORT).show()
-                PLYEvent.RestoreStarted -> Toast.makeText(applicationContext, "Click on restore", Toast.LENGTH_SHORT).show()
-                is PLYEvent.InAppPurchaseFailed -> Toast.makeText(applicationContext, "In app failed : ${event.error?.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

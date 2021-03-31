@@ -19,7 +19,9 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            //signingConfig signingConfigs.release
         }
     }
 
@@ -46,14 +48,14 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
+    //implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
+    //implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
 
-    implementation 'io.purchasely:core:2.2.2'
-    implementation 'io.purchasely:google-play:2.2.2'
-    implementation 'io.purchasely:huawei-services:2.2.2'
+    implementation 'io.purchasely:core:2.3.0'
+    implementation 'io.purchasely:google-play:2.3.0'
+    implementation 'io.purchasely:huawei-services:2.3.0'
 
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
