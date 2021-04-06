@@ -2,19 +2,19 @@ package io.purchasely.sample.kotlin
 
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
-import io.purchasely.ext.*
+import io.purchasely.ext.PLYAlertMessage
+import io.purchasely.ext.PLYProcessToPaymentHandler
+import io.purchasely.ext.PLYPurchaseCompletionHandler
+import io.purchasely.ext.Purchasely
 import io.purchasely.sample.R
 import kotlinx.android.synthetic.main.activity_feature_list.*
 
@@ -114,7 +114,7 @@ class FeatureListActivity : FragmentActivity() {
      * true if you allow the user to continue with his purchase
      * false otherwise
      */
-    private val purchaseHandler: PurchaseCompletionHandler = { activity, processToPayment ->
+    private val purchaseHandler: PLYPurchaseCompletionHandler = { activity, processToPayment ->
         //display an alert dialog
         AlertDialog.Builder(this)
                 .setTitle("Do you agree with our terms and conditions ?")
@@ -140,7 +140,7 @@ class FeatureListActivity : FragmentActivity() {
 
 }
 
-class LegalFragment(val callback: ProcessToPaymentHandler) : Fragment() {
+class LegalFragment(val callback: PLYProcessToPaymentHandler) : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_legal, container, false)

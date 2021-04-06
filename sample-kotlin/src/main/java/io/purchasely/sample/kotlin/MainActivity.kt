@@ -8,13 +8,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.billingclient.api.Purchase
 import io.purchasely.ext.EventListener
 import io.purchasely.ext.LogLevel
 import io.purchasely.ext.PLYEvent
 import io.purchasely.ext.Purchasely
 import io.purchasely.google.GoogleStore
-import io.purchasely.huawei.HuaweiStore
 import io.purchasely.models.PLYPlan
 import io.purchasely.sample.R
 import kotlinx.android.extensions.LayoutContainer
@@ -48,9 +46,16 @@ class MainActivity : AppCompatActivity() {
         getProducts()
 
         Purchasely.userLogin("DEMO_USER") { refresh ->
-            if(refresh) {
+            if (refresh) {
                 //Purchases were transferred to the user, you may need to refresh your user information
             }
+        }
+
+        Purchasely.setLoginTappedHandler { activity, isLoggedIn ->
+            if (activity == null) return@setLoginTappedHandler
+
+            //display your login view and send result back
+            isLoggedIn(true) //true if user is logged in
         }
 
     }
