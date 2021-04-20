@@ -2,16 +2,14 @@ package io.purchasely.sample.kotlin
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.purchasely.ext.EventListener
-import io.purchasely.ext.LogLevel
-import io.purchasely.ext.PLYEvent
-import io.purchasely.ext.Purchasely
+import io.purchasely.ext.*
 import io.purchasely.google.GoogleStore
 import io.purchasely.models.PLYPlan
 import io.purchasely.sample.R
@@ -43,7 +41,17 @@ class MainActivity : AppCompatActivity() {
         buttonDisplayFeatureList.setOnClickListener { startActivity(Intent(applicationContext, FeatureListActivity::class.java)) }
         buttonSubscriptions.setOnClickListener { startActivity(Intent(applicationContext, SubscriptionsActivity::class.java)) }
 
-        getProducts()
+        buttonRestore.setOnClickListener {
+            Purchasely.restoreAllProducts(
+                    success = { plan ->
+                        Log.d("Sample", "Restored $plan")
+                    },
+                    error = { error ->
+                        Log.d("Sample", "Restoration failed $error")
+
+                    }
+            )
+        }
 
         Purchasely.userLogin("DEMO_USER") { refresh ->
             if (refresh) {
@@ -62,8 +70,10 @@ class MainActivity : AppCompatActivity() {
 
     private val eventListener = object: EventListener {
         override fun onEvent(event: PLYEvent) {
-            when(event) {
+            when (event) {
                 PLYEvent.AppStarted -> getProducts()
+                PLYEvent.AppUpdated -> Log.d("Event", "App Updated")
+                PLYEvent.AppInstalled -> Log.d("Event", "App Installed")
                 PLYEvent.LoginTapped -> Toast.makeText(applicationContext, "User asked to login", Toast.LENGTH_LONG).show()
             }
         }
