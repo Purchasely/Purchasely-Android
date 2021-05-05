@@ -64,7 +64,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.fragment:fragment-ktx:1.3.2'
+    implementation 'androidx.fragment:fragment-ktx:1.3.3'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.0'
@@ -73,9 +73,10 @@ dependencies {
     //implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
     //implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
 
-    implementation 'io.purchasely:core:2.4.5'
-    implementation 'io.purchasely:google-play:2.4.5'
-    implementation 'io.purchasely:huawei-services:2.4.5'
+    implementation 'io.purchasely:core:2.4.6'
+    implementation 'io.purchasely:google-play:2.4.6'
+    implementation 'io.purchasely:huawei-services:2.4.6'
+    implementation 'io.purchasely:amazon:2.4.6'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

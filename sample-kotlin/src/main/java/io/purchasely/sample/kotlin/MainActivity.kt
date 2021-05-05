@@ -44,10 +44,10 @@ class MainActivity : AppCompatActivity() {
         buttonRestore.setOnClickListener {
             Purchasely.restoreAllProducts(
                     success = { plan ->
-                        Log.d("Sample", "Restored $plan")
+                        Log.e("Sample", "Restored $plan")
                     },
                     error = { error ->
-                        Log.d("Sample", "Restoration failed $error")
+                        Log.e("Sample", "Restoration failed $error")
 
                     }
             )
