@@ -66,6 +66,13 @@ class MainActivity : AppCompatActivity() {
             isLoggedIn(true) //true if user is logged in
         }
 
+        /*
+            If you need the purchase result when a paywall is open directly via a deeplink :
+            Purchasely.setDefaultPresentationResultHandler  { result, plan ->
+                Log.d("PurchaselyDemo", "Purchased result is $result with plan ${plan?.vendorId}")
+            }
+         */
+
     }
 
     private val eventListener = object: EventListener {
