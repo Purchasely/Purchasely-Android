@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getProducts() {
-        Purchasely.getProducts(
+        Purchasely.allProducts(
                 onSuccess = { products ->
                     adapter.list.addAll(products.flatMap { it.plans })
                     adapter.notifyDataSetChanged()
