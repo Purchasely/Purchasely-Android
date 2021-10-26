@@ -20,7 +20,7 @@ class SubscriptionsActivity : FragmentActivity() {
                 Purchasely.subscriptionsFragment(),
                 "SubscriptionsFragment"
             )
-                .commitAllowingStateLoss()
+            .commitAllowingStateLoss()
 
         progressBar.isVisible = false
 
