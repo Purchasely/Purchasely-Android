@@ -13,11 +13,13 @@ class SubscriptionsActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
+        val fragment = Purchasely.subscriptionsFragment() ?: return
+
         supportFragmentManager.beginTransaction()
             .addToBackStack(null)
             .replace(
                 R.id.inappFragment,
-                Purchasely.subscriptionsFragment(),
+                fragment,
                 "SubscriptionsFragment"
             )
             .commitAllowingStateLoss()

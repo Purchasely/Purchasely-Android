@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.purchasely.ext.*
@@ -15,6 +16,7 @@ import io.purchasely.models.PLYPlan
 import io.purchasely.sample.R
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,9 +36,9 @@ class MainActivity : AppCompatActivity() {
                 .eventListener(eventListener)
                 .logLevel(LogLevel.DEBUG)
                 .isReadyToPurchase(true)
+                .runningMode(PLYRunningMode.Full)
                 .stores(listOf(GoogleStore()))
                 .build()
-                .start()
 
         buttonDisplayFeatureList.setOnClickListener { startActivity(Intent(applicationContext, FeatureListActivity::class.java)) }
         buttonSubscriptions.setOnClickListener { startActivity(Intent(applicationContext, SubscriptionsActivity::class.java)) }
@@ -51,6 +53,7 @@ class MainActivity : AppCompatActivity() {
 
                     }
             )
+
         }
 
         Purchasely.userLogin("DEMO_USER") { refresh ->
@@ -59,13 +62,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        Purchasely.setLoginTappedHandler { activity, isLoggedIn ->
-            if (activity == null) return@setLoginTappedHandler
-
-            //display your login view and send result back
-            isLoggedIn(true) //true if user is logged in
+        Purchasely.setPaywallActionsInterceptor { info, action, parameters, processAction ->
+            Log.d("Purchasely", "Received action $action for $info with $parameters")
+            processAction(true)
         }
-
         /*
             If you need the purchase result when a paywall is open directly via a deeplink :
             Purchasely.setDefaultPresentationResultHandler  { result, plan ->

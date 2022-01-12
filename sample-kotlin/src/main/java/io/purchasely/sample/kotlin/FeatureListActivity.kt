@@ -10,10 +10,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.android.billingclient.api.Purchase
 import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.PLYAlertMessage
-import io.purchasely.ext.PLYProcessToPaymentHandler
-import io.purchasely.ext.PLYPurchaseCompletionHandler
+import io.purchasely.ext.PLYPaywallActionHandler
+import io.purchasely.ext.PLYPresentationAction
 import io.purchasely.ext.Purchasely
 import io.purchasely.sample.R
 import kotlinx.android.synthetic.main.activity_feature_list.*
@@ -24,12 +25,9 @@ class FeatureListActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
-        Purchasely.setConfirmPurchaseHandler(purchaseHandler)
-
-        val fragment = Purchasely.presentationFragment(
-                presentationId = null) { result, plan ->
+        val fragment = Purchasely.presentationFragment(null, null, null) { result, plan ->
             Log.d("PurchaselyDemo", "Purchased result is $result with plan ${plan?.vendorId}")
-        }
+        } ?: return
 
         //You can also display the presentation for a specific product or plan
         //Purchasely.productFragment("productId", "presentationId or null for default")
@@ -63,6 +61,8 @@ class FeatureListActivity : FragmentActivity() {
             Log.d("Purchasely", "User purchased product $it")
             Snackbar.make(window.decorView, "Purchased ${it?.vendorId}", Snackbar.LENGTH_SHORT).show()
         }
+
+        Purchasely.setPaywallActionsInterceptor(paywallActionInterceptor)
 
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount == 0) {
@@ -114,33 +114,40 @@ class FeatureListActivity : FragmentActivity() {
      * true if you allow the user to continue with his purchase
      * false otherwise
      */
-    private val purchaseHandler: PLYPurchaseCompletionHandler = { activity, processToPayment ->
-        //display an alert dialog
-        AlertDialog.Builder(this)
-                .setTitle("Do you agree with our terms and conditions ?")
-                .setPositiveButton("I agree") { dialog, _ ->
-                    processToPayment(true)
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    processToPayment(false)
-                    dialog.dismiss()
-                }
-                .create()
-                .show()
+    private val paywallActionInterceptor: PLYPaywallActionHandler = {
+            info, action, parameters, processAction ->
 
-        //or display a fragment
-        /*
-        supportFragmentManager.beginTransaction()
-                .addToBackStack(null)
-                .add(R.id.inappFragment, LegalFragment(result), "InAppFragment")
-                .commitAllowingStateLoss()
-         */
+        when(action) {
+            PLYPresentationAction.PURCHASE -> {
+                //display an alert dialog
+                AlertDialog.Builder(this)
+                    .setTitle("Do you agree with our terms and conditions ?")
+                    .setPositiveButton("I agree") { dialog, _ ->
+                        processAction(true)
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("Cancel") { dialog, _ ->
+                        processAction(false)
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
+
+                //or display a fragment
+                /*
+                supportFragmentManager.beginTransaction()
+                        .addToBackStack(null)
+                        .add(R.id.inappFragment, LegalFragment(result), "InAppFragment")
+                        .commitAllowingStateLoss()
+                 */
+            }
+            else -> processAction(true)
+        }
     }
 
 }
 
-class LegalFragment(val callback: PLYProcessToPaymentHandler) : Fragment() {
+/*class LegalFragment(val callback: PLYProcessToPaymentHandler) : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_legal, container, false)
@@ -160,4 +167,4 @@ class LegalFragment(val callback: PLYProcessToPaymentHandler) : Fragment() {
         }
     }
 
-}
+}*/
