@@ -25,9 +25,12 @@ class FeatureListActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
-        val fragment = Purchasely.presentationFragment(null, null, null) { result, plan ->
+        val fragment = Purchasely.presentationFragment("CAROUSEL", null, null) { result, plan ->
             Log.d("PurchaselyDemo", "Purchased result is $result with plan ${plan?.vendorId}")
         } ?: return
+
+        //You may want to display a presentation with a placement for different groups of users
+        //Purchasely.presentationFragmentForPlacement("my_placement_id", "my content id", null, null)
 
         //You can also display the presentation for a specific product or plan
         //Purchasely.productFragment("productId", "presentationId or null for default")

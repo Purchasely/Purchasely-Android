@@ -40,6 +40,8 @@ class MainActivity : AppCompatActivity() {
                 .stores(listOf(GoogleStore()))
                 .build()
 
+        //Purchasely.playerView = "io.purchasely.player.PLYPlayerView"
+
         buttonDisplayFeatureList.setOnClickListener { startActivity(Intent(applicationContext, FeatureListActivity::class.java)) }
         buttonSubscriptions.setOnClickListener { startActivity(Intent(applicationContext, SubscriptionsActivity::class.java)) }
 

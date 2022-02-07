@@ -11,7 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="io.purchasely.sample.kotlin.MainActivity"
+        <activity
+            android:name="io.purchasely.sample.kotlin.MainActivity"
+            android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,8 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="io.purchasely.sample.kotlin.FeatureListActivity" />
-        <activity android:name="io.purchasely.sample.kotlin.SubscriptionsActivity" />
+        <activity android:exported="true" android:name="io.purchasely.sample.kotlin.FeatureListActivity" />
+        <activity android:exported="true" android:name="io.purchasely.sample.kotlin.SubscriptionsActivity" />
 
     </application>
 
