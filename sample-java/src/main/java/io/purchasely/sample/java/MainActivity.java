@@ -19,7 +19,6 @@ import java.util.List;
 
 import io.purchasely.billing.Store;
 import io.purchasely.ext.LogLevel;
-import io.purchasely.ext.PLYRunningMode;
 import io.purchasely.ext.ProductsListener;
 import io.purchasely.ext.Purchasely;
 import io.purchasely.google.GoogleStore;
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
                 .apiKey("afa96c76-1d8e-4e3c-a48f-204a3cd93a15")
                 .logLevel(LogLevel.DEBUG)
                 .isReadyToPurchase(true)
-                .runningMode(PLYRunningMode.Full.INSTANCE)
                 .stores(stores)
                 .build();
 
@@ -130,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             content.append("\n");
             content.append(String.format("Full introductory price: %s", plan.localizedFullIntroductoryPrice()));
             content.append("\n");
-            content.append(String.format("Introductory Price: %s", plan.localizedIntroductoryPrice(false)));
+            content.append(String.format("Introductory Price: %s", plan.localizedIntroductoryPrice()));
             content.append("\n");
             content.append(String.format("Introductory Period: %s", plan.localizedIntroductoryPeriod()));
             content.append("\n");

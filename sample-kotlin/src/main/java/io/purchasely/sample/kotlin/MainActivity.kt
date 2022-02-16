@@ -36,7 +36,6 @@ class MainActivity : AppCompatActivity() {
                 .eventListener(eventListener)
                 .logLevel(LogLevel.DEBUG)
                 .isReadyToPurchase(true)
-                .runningMode(PLYRunningMode.Full)
                 .stores(listOf(GoogleStore()))
                 .build()
 
@@ -64,10 +63,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        Purchasely.setPaywallActionsInterceptor { info, action, parameters, processAction ->
-            Log.d("Purchasely", "Received action $action for $info with $parameters")
-            processAction(true)
-        }
         /*
             If you need the purchase result when a paywall is open directly via a deeplink :
             Purchasely.setDefaultPresentationResultHandler  { result, plan ->
@@ -129,7 +124,7 @@ class Holder(override val containerView: TextView) : RecyclerView.ViewHolder(con
         containerView.text = buildString {
             append(plan.store_product_id)
             append("\n")
-            append(String.format("Type: %s", plan.type?.name?.lowercase()))
+            append(String.format("Type: %s", plan.type?.name?.toLowerCase()))
             append("\n")
             append(String.format("Full Price: %s", plan.localizedFullPrice()))
             append("\n")

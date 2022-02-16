@@ -27,7 +27,6 @@ public class FeatureListActivity extends AppCompatActivity {
         Fragment fragment = Purchasely.presentationFragment(
                 null, //Presentation Id, may be null for default
                 null,
-                loaded -> null, //callback when fragment is ready to be displayed
                 (plyProductViewResult, plyPlan) -> {
                     String vendorId = plyPlan.getVendorId();
                     Snackbar.make(
