@@ -72,11 +72,11 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
 
-    implementation 'io.purchasely:core:3.1.1'
-    implementation 'io.purchasely:google-play:3.1.1'
-    implementation 'io.purchasely:huawei-services:3.1.1'
-    implementation 'io.purchasely:amazon:3.1.1'
-    implementation 'io.purchasely:player:3.1.1'
+    implementation 'io.purchasely:core:3.2.0'
+    implementation 'io.purchasely:google-play:3.2.0'
+    implementation 'io.purchasely:huawei-services:3.2.0'
+    implementation 'io.purchasely:amazon:3.2.0'
+    implementation 'io.purchasely:player:3.2.0'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
