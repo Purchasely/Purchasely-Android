@@ -37,7 +37,6 @@ class FeatureListActivity : FragmentActivity() {
         //Purchasely.planFragment("planId", "presentationId or null for default")
 
         supportFragmentManager.beginTransaction()
-                .addToBackStack(null)
                 .replace(R.id.inappFragment, fragment, "InAppFragment")
                 .commitAllowingStateLoss()
 
@@ -67,16 +66,15 @@ class FeatureListActivity : FragmentActivity() {
 
         Purchasely.setPaywallActionsInterceptor(paywallActionInterceptor)
 
-        supportFragmentManager.addOnBackStackChangedListener {
+        /*supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount == 0) {
                 supportFinishAfterTransition()
             }
-        }
+        }*/
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Purchasely.uiListener = null
     }
 
     /**

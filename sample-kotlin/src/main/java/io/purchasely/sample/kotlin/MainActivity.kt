@@ -64,10 +64,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        Purchasely.setPaywallActionsInterceptor { info, action, parameters, processAction ->
-            Log.d("Purchasely", "Received action $action for $info with $parameters")
-            processAction(true)
-        }
         /*
             If you need the purchase result when a paywall is open directly via a deeplink :
             Purchasely.setDefaultPresentationResultHandler  { result, plan ->
