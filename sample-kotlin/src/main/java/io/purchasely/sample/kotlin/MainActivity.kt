@@ -40,6 +40,8 @@ class MainActivity : AppCompatActivity() {
                 .stores(listOf(GoogleStore()))
                 .build()
 
+        Purchasely.userLogout()
+
         //Purchasely.playerView = "io.purchasely.player.PLYPlayerView"
 
         buttonDisplayFeatureList.setOnClickListener { startActivity(Intent(applicationContext, FeatureListActivity::class.java)) }
@@ -56,12 +58,6 @@ class MainActivity : AppCompatActivity() {
                     }
             )
 
-        }
-
-        Purchasely.userLogin("DEMO_USER") { refresh ->
-            if (refresh) {
-                //Purchases were transferred to the user, you may need to refresh your user information
-            }
         }
 
         /*

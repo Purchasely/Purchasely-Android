@@ -1,22 +1,25 @@
 package io.purchasely.sample.kotlin
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.android.billingclient.api.Purchase
 import com.google.android.material.snackbar.Snackbar
-import io.purchasely.ext.PLYAlertMessage
-import io.purchasely.ext.PLYPaywallActionHandler
-import io.purchasely.ext.PLYPresentationAction
-import io.purchasely.ext.Purchasely
+import io.purchasely.ext.*
 import io.purchasely.sample.R
+import io.purchasely.views.px
 import kotlinx.android.synthetic.main.activity_feature_list.*
 
 class FeatureListActivity : FragmentActivity() {
@@ -142,6 +145,30 @@ class FeatureListActivity : FragmentActivity() {
                         .commitAllowingStateLoss()
                  */
             }
+            PLYPresentationAction.CLOSE -> {
+                AlertDialog.Builder(this)
+                    .setTitle("Close paywall ?")
+                    .setPositiveButton("Close") { dialog, _ ->
+                        processAction(true)
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("Cancel") { dialog, _ ->
+                        processAction(false)
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
+            }
+            PLYPresentationAction.LOGIN -> {
+                /*
+                    You should add() your own fragment on top of purchasely paywall
+                    You can also replace() it but this will reload the paywall when displayed again
+                 */
+                supportFragmentManager.beginTransaction()
+                    .addToBackStack(null)
+                    .add(R.id.inappFragment, LoginFragment(processAction), "LoginFragment")
+                    .commitAllowingStateLoss()
+            }
             else -> processAction(true)
         }
     }
@@ -169,3 +196,62 @@ class FeatureListActivity : FragmentActivity() {
     }
 
 }*/
+
+class LoginFragment(private val processAction: PLYCompletionHandler) : Fragment() {
+
+    private val layout by lazy {
+        LinearLayout(requireContext()).apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            setPadding(24.px())
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(Color.WHITE)
+            addView(EditText(requireContext()).apply {
+                hint = "User id"
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topMargin = 30.px()
+                    marginStart = 50.px()
+                    marginEnd = 50.px()
+                }
+            })
+            addView(Button(requireContext()).apply {
+                text = "Log In"
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topMargin = 30.px()
+                    marginStart = 50.px()
+                    marginEnd = 50.px()
+                    gravity = Gravity.CENTER_HORIZONTAL
+                }
+                setOnClickListener {
+                    val editContent = (getChildAt(0) as EditText).text.toString()
+                    val userId = editContent.ifEmpty { null }
+                    if (userId != null) {
+                        Purchasely.userLogin(userId)
+                        processAction(true)
+                    } else {
+                        processAction(false)
+                    }
+                    activity?.supportFragmentManager?.popBackStack()
+                }
+            })
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return layout
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+}
