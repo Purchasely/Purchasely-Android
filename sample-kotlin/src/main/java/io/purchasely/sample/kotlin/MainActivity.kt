@@ -39,12 +39,14 @@ class MainActivity : AppCompatActivity() {
                 .runningMode(PLYRunningMode.Full)
                 .stores(listOf(GoogleStore()))
                 .build()
+                .start()
 
         Purchasely.userLogout()
 
         //Purchasely.playerView = "io.purchasely.player.PLYPlayerView"
 
         buttonDisplayFeatureList.setOnClickListener { startActivity(Intent(applicationContext, FeatureListActivity::class.java)) }
+        buttonDisplayCompose.setOnClickListener { startActivity(Intent(applicationContext, ComposeActivity::class.java)) }
         buttonSubscriptions.setOnClickListener { startActivity(Intent(applicationContext, SubscriptionsActivity::class.java)) }
 
         buttonRestore.setOnClickListener {
@@ -76,6 +78,7 @@ class MainActivity : AppCompatActivity() {
                 PLYEvent.AppUpdated -> Log.d("Event", "App Updated")
                 PLYEvent.AppInstalled -> Log.d("Event", "App Installed")
                 PLYEvent.LoginTapped -> Toast.makeText(applicationContext, "User asked to login", Toast.LENGTH_LONG).show()
+                else -> {}
             }
         }
     }

@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.buttonDisplayFeatureList).setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), FeatureListActivity.class)));
 
-        Purchasely.allProducts(new ProductsListener() {
+        /*Purchasely.allProducts(new ProductsListener() {
             @Override
             public void onSuccess(@NotNull List<PLYProduct> list) {
                 List<PLYPlan> plans = new ArrayList<>();
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(@NotNull Throwable throwable) {
                 Toast.makeText(getApplicationContext(), "Error " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
 
     }
 

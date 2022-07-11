@@ -31,10 +31,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Display Product Presentation"
+            android:text="Display Paywall"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/buttonDisplayCompose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Jetpack Compose Paywall"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonDisplayFeatureList" />
 
         <Button
             android:id="@+id/buttonSubscriptions"
@@ -44,7 +54,7 @@
             android:text="Subscriptions"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonDisplayFeatureList" />
+            app:layout_constraintTop_toBottomOf="@+id/buttonDisplayCompose" />
 
         <Button
             android:id="@+id/buttonRestore"

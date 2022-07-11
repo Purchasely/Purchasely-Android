@@ -12,6 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name="io.purchasely.sample.kotlin.ComposeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_compose"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name="io.purchasely.sample.kotlin.MainActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
@@ -21,9 +26,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:exported="true" android:name="io.purchasely.sample.kotlin.FeatureListActivity" />
-        <activity android:exported="true" android:name="io.purchasely.sample.kotlin.SubscriptionsActivity" />
-
+        <activity
+            android:name="io.purchasely.sample.kotlin.FeatureListActivity"
+            android:exported="true" />
+        <activity
+            android:name="io.purchasely.sample.kotlin.SubscriptionsActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

@@ -28,7 +28,7 @@ class FeatureListActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
-        val fragment = Purchasely.presentationFragment("CAROUSEL", null, null) { result, plan ->
+        val fragment = Purchasely.presentationFragmentForPlacement("ACCOUNT", null, null) { result, plan ->
             Log.d("PurchaselyDemo", "Purchased result is $result with plan ${plan?.vendorId}")
         } ?: return
 
