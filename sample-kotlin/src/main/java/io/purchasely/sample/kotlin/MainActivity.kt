@@ -74,10 +74,10 @@ class MainActivity : AppCompatActivity() {
     private val eventListener = object: EventListener {
         override fun onEvent(event: PLYEvent) {
             when (event) {
-                PLYEvent.AppStarted -> getProducts()
-                PLYEvent.AppUpdated -> Log.d("Event", "App Updated")
-                PLYEvent.AppInstalled -> Log.d("Event", "App Installed")
-                PLYEvent.LoginTapped -> Toast.makeText(applicationContext, "User asked to login", Toast.LENGTH_LONG).show()
+                is PLYEvent.AppStarted -> getProducts()
+                is PLYEvent.AppUpdated -> Log.d("Event", "App Updated")
+                is PLYEvent.AppInstalled -> Log.d("Event", "App Installed")
+                is PLYEvent.LoginTapped -> Toast.makeText(applicationContext, "User asked to login", Toast.LENGTH_LONG).show()
                 else -> {}
             }
         }

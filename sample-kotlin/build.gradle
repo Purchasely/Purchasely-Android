@@ -86,10 +86,10 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
 
-    implementation 'io.purchasely:core:3.3.0'
-    implementation 'io.purchasely:google-play:3.3.0'
-    implementation 'io.purchasely:huawei-services:3.3.0'
-    implementation 'io.purchasely:amazon:3.3.0'
+    implementation "io.purchasely:core:$purchasely_version"
+    implementation "io.purchasely:google-play:$purchasely_version"
+    implementation "io.purchasely:huawei-services:$purchasely_version"
+    implementation "io.purchasely:amazon:$purchasely_version"
 
     implementation "androidx.lifecycle:lifecycle-common-java8:2.5.0"
 
