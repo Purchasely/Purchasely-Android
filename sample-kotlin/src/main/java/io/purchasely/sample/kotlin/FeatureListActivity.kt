@@ -67,7 +67,64 @@ class FeatureListActivity : FragmentActivity() {
             Snackbar.make(window.decorView, "Purchased ${it?.vendorId}", Snackbar.LENGTH_SHORT).show()
         }
 
-        Purchasely.setPaywallActionsInterceptor(paywallActionInterceptor)
+        /**
+         * Before displaying purchase view, you can display you own content
+         * and send back a boolean to result callback
+         * true if you allow the user to continue with his purchase
+         * false otherwise
+         */
+        Purchasely.setPaywallActionsInterceptor { info, action, parameters, processAction ->
+            when(action) {
+                PLYPresentationAction.PURCHASE -> {
+                    //display an alert dialog
+                    AlertDialog.Builder(this)
+                        .setTitle("Do you agree with our terms and conditions ?")
+                        .setPositiveButton("I agree") { dialog, _ ->
+                            processAction(true)
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton("Cancel") { dialog, _ ->
+                            processAction(false)
+                            dialog.dismiss()
+                        }
+                        .create()
+                        .show()
+
+                    //or display a fragment
+                    /*
+                    supportFragmentManager.beginTransaction()
+                            .addToBackStack(null)
+                            .add(R.id.inappFragment, LegalFragment(result), "InAppFragment")
+                            .commitAllowingStateLoss()
+                     */
+                }
+                PLYPresentationAction.CLOSE -> {
+                    AlertDialog.Builder(this)
+                        .setTitle("Close paywall ?")
+                        .setPositiveButton("Close") { dialog, _ ->
+                            processAction(true)
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton("Cancel") { dialog, _ ->
+                            processAction(false)
+                            dialog.dismiss()
+                        }
+                        .create()
+                        .show()
+                }
+                PLYPresentationAction.LOGIN -> {
+                    /*
+                        You should add() your own fragment on top of purchasely paywall
+                        You can also replace() it but this will reload the paywall when displayed again
+                     */
+                    supportFragmentManager.beginTransaction()
+                        .addToBackStack(null)
+                        .add(R.id.inappFragment, LoginFragment(processAction), "LoginFragment")
+                        .commitAllowingStateLoss()
+                }
+                else -> processAction(true)
+            }
+        }
 
         /*supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount == 0) {
@@ -110,67 +167,6 @@ class FeatureListActivity : FragmentActivity() {
                 }
                 .create()
                 .show()
-    }
-
-    /**
-     * Before displaying purchase view, you can display you own content
-     * and send back a boolean to result callback
-     * true if you allow the user to continue with his purchase
-     * false otherwise
-     */
-    private val paywallActionInterceptor: PLYPaywallActionHandler = {
-            info, action, parameters, processAction ->
-
-        when(action) {
-            PLYPresentationAction.PURCHASE -> {
-                //display an alert dialog
-                AlertDialog.Builder(this)
-                    .setTitle("Do you agree with our terms and conditions ?")
-                    .setPositiveButton("I agree") { dialog, _ ->
-                        processAction(true)
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton("Cancel") { dialog, _ ->
-                        processAction(false)
-                        dialog.dismiss()
-                    }
-                    .create()
-                    .show()
-
-                //or display a fragment
-                /*
-                supportFragmentManager.beginTransaction()
-                        .addToBackStack(null)
-                        .add(R.id.inappFragment, LegalFragment(result), "InAppFragment")
-                        .commitAllowingStateLoss()
-                 */
-            }
-            PLYPresentationAction.CLOSE -> {
-                AlertDialog.Builder(this)
-                    .setTitle("Close paywall ?")
-                    .setPositiveButton("Close") { dialog, _ ->
-                        processAction(true)
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton("Cancel") { dialog, _ ->
-                        processAction(false)
-                        dialog.dismiss()
-                    }
-                    .create()
-                    .show()
-            }
-            PLYPresentationAction.LOGIN -> {
-                /*
-                    You should add() your own fragment on top of purchasely paywall
-                    You can also replace() it but this will reload the paywall when displayed again
-                 */
-                supportFragmentManager.beginTransaction()
-                    .addToBackStack(null)
-                    .add(R.id.inappFragment, LoginFragment(processAction), "LoginFragment")
-                    .commitAllowingStateLoss()
-            }
-            else -> processAction(true)
-        }
     }
 
 }
