@@ -31,7 +31,9 @@ class ComposeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting("Android")
+                    Greeting("Android") {
+                        this@ComposeActivity.finish()
+                    }
                 }
             }
         }
@@ -39,7 +41,7 @@ class ComposeActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
+fun Greeting(name: String, close: (() -> Unit)? = null) {
     val displayPaywall = remember { mutableStateOf(true) }
 
     Column {
@@ -50,6 +52,8 @@ fun Greeting(name: String) {
 
         if(displayPaywall.value)
             paywall(displayPaywall)
+        else
+            close?.invoke()
     }
 }
 

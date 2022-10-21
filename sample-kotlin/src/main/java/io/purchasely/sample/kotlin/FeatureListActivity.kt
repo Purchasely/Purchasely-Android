@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -28,22 +29,55 @@ class FeatureListActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
-        val fragment = Purchasely.presentationFragmentForPlacement("ACCOUNT", null, null) { result, plan ->
+        //You can use a fragment (deprecated) or use a view
+        val paywallFragment = Purchasely.presentationFragmentForPlacement("ACCOUNT", null, null) { result, plan ->
             Log.d("PurchaselyDemo", "Purchased result is $result with plan ${plan?.vendorId}")
         } ?: return
-
-        //You may want to display a presentation with a placement for different groups of users
-        //Purchasely.presentationFragmentForPlacement("my_placement_id", "my content id", null, null)
 
         //You can also display the presentation for a specific product or plan
         //Purchasely.productFragment("productId", "presentationId or null for default")
         //Purchasely.planFragment("planId", "presentationId or null for default")
 
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.inappFragment, fragment, "InAppFragment")
-                .commitAllowingStateLoss()
+        //You can display the fragment as usual
+        /*supportFragmentManager.beginTransaction()
+            .replace(R.id.inappFragment, paywallFragment, "InAppFragment")
+            .commitAllowingStateLoss()*/
 
-        progressBar.isVisible = false
+        //you can setup the paywall in an invisible container to load it until ready
+        findViewById<FrameLayout>(R.id.paywall).visibility = View.INVISIBLE
+
+        val paywallView = Purchasely.presentationView(
+            this,
+            PLYPresentationViewProperties(
+                placementId = "ACCOUNT",
+                contentId = "my_content_id which is optional",
+                displayCloseButton = true, //true by default, you can set to false if you never want it displayed
+                onLoaded = { isLoaded ->
+                    //paywall is ready to be shown
+                    if(isLoaded) {
+                        progressBar.isVisible = false
+                        findViewById<FrameLayout>(R.id.paywall).visibility = View.VISIBLE
+                    }
+                },
+                onClose = {
+                    //TODO this is mandatory to handle with a View to remove it when user click on close button
+                    findViewById<FrameLayout>(R.id.paywall).removeAllViews()
+
+                    //this activity has nothing to display so close it
+                    supportFinishAfterTransition()
+                }
+            )
+        ) { result, plan ->
+            //called when paywall is closed
+            //Purchased and Restored are returned only if purchase was validated by Purchasely, Google and your backend (if webhook configured)
+            when(result) {
+                PLYProductViewResult.PURCHASED -> Log.d("Purchasely", "User purchased $plan, you can call your backend to refresh user information and grant his entitlements")
+                PLYProductViewResult.RESTORED -> Log.d("Purchasely", "User restored $plan, you can call your backend to refresh user information and grant his entitlements")
+                PLYProductViewResult.CANCELLED -> Log.d("Purchasely", "User closed paywall without purchasing")
+            }
+        }
+
+        findViewById<FrameLayout>(R.id.paywall).addView(paywallView)
 
         //Implement UI Listener to handle UI event that may appear to user (success and error dialog)
         /*Purchasely.uiListener = object: UIListener {
@@ -114,13 +148,12 @@ class FeatureListActivity : FragmentActivity() {
                 }
                 PLYPresentationAction.LOGIN -> {
                     /*
-                        You should add() your own fragment on top of purchasely paywall
-                        You can also replace() it but this will reload the paywall when displayed again
+                        Display your own view to log in the user
+                        DO NOT FORGET to call Purchasely.userLogin(userId) after successful login
                      */
-                    supportFragmentManager.beginTransaction()
-                        .addToBackStack(null)
-                        .add(R.id.inappFragment, LoginFragment(processAction), "LoginFragment")
-                        .commitAllowingStateLoss()
+
+                    //Once done call with true if user logged in or false if he did not
+                    processAction(true)
                 }
                 else -> processAction(true)
             }
@@ -131,10 +164,6 @@ class FeatureListActivity : FragmentActivity() {
                 supportFinishAfterTransition()
             }
         }*/
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     /**
@@ -192,62 +221,3 @@ class FeatureListActivity : FragmentActivity() {
     }
 
 }*/
-
-class LoginFragment(private val processAction: PLYCompletionHandler) : Fragment() {
-
-    private val layout by lazy {
-        LinearLayout(requireContext()).apply {
-            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-            setPadding(24.px())
-            orientation = LinearLayout.VERTICAL
-            setBackgroundColor(Color.WHITE)
-            addView(EditText(requireContext()).apply {
-                hint = "User id"
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    topMargin = 30.px()
-                    marginStart = 50.px()
-                    marginEnd = 50.px()
-                }
-            })
-            addView(Button(requireContext()).apply {
-                text = "Log In"
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    topMargin = 30.px()
-                    marginStart = 50.px()
-                    marginEnd = 50.px()
-                    gravity = Gravity.CENTER_HORIZONTAL
-                }
-                setOnClickListener {
-                    val editContent = (getChildAt(0) as EditText).text.toString()
-                    val userId = editContent.ifEmpty { null }
-                    if (userId != null) {
-                        Purchasely.userLogin(userId)
-                        processAction(true)
-                    } else {
-                        processAction(false)
-                    }
-                    activity?.supportFragmentManager?.popBackStack()
-                }
-            })
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return layout
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-}

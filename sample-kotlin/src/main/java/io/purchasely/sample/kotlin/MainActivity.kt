@@ -35,13 +35,18 @@ class MainActivity : AppCompatActivity() {
                 //TODO set your api key
                 .apiKey("afa96c76-1d8e-4e3c-a48f-204a3cd93a15")
                 .eventListener(eventListener)
-                .logLevel(LogLevel.DEBUG)
-                .isReadyToPurchase(true)
-                .runningMode(PLYRunningMode.Full)
+                .userId(null) //you can set an user id if you have one
+                .logLevel(LogLevel.DEBUG) //set to ERROR in production
+                .isReadyToPurchase(true) //to open paywalls from deeplinks
+                .runningMode(PLYRunningMode.Full) //set to PLYRunningMode.PaywallObserver if you keep your transaction stack
                 .stores(listOf(GoogleStore()))
                 .build()
-                .start()
+                .start { isConfigured, error ->
+                    if(isConfigured) Log.d("Purchasely", "You can display paywalls and make purchases")
+                    if(error != null) Log.e("Purchasely", "Configuration error", error)
+                }
 
+        //make sure no user is saved if none is logged in
         Purchasely.userLogout()
 
         //Purchasely.playerView = "io.purchasely.player.PLYPlayerView"

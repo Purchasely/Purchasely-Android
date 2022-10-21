@@ -18,7 +18,7 @@ class SubscriptionsActivity : FragmentActivity() {
         supportFragmentManager.beginTransaction()
             .addToBackStack(null)
             .replace(
-                R.id.inappFragment,
+                R.id.paywall,
                 fragment,
                 "SubscriptionsFragment"
             )
