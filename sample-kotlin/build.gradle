@@ -13,12 +13,12 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "io.purchasely.sample"
         minSdkVersion 22
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode 2
         versionName "1.0"
 
@@ -88,8 +88,7 @@ dependencies {
 
     implementation "io.purchasely:core:$purchasely_version"
     implementation "io.purchasely:google-play:$purchasely_version"
-    implementation "io.purchasely:huawei-services:$purchasely_version"
-    implementation "io.purchasely:amazon:$purchasely_version"
+    implementation "io.purchasely:player:$purchasely_version"
 
     implementation "androidx.lifecycle:lifecycle-common-java8:2.5.0"
 
