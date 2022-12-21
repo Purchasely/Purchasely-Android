@@ -111,7 +111,7 @@ class FeatureListActivity : FragmentActivity() {
             when(action) {
                 PLYPresentationAction.PURCHASE -> {
                     //display an alert dialog
-                    AlertDialog.Builder(this)
+                    AlertDialog.Builder(this@FeatureListActivity)
                         .setTitle("Do you agree with our terms and conditions ?")
                         .setPositiveButton("I agree") { dialog, _ ->
                             processAction(true)
@@ -133,7 +133,7 @@ class FeatureListActivity : FragmentActivity() {
                      */
                 }
                 PLYPresentationAction.CLOSE -> {
-                    AlertDialog.Builder(this)
+                    AlertDialog.Builder(this@FeatureListActivity)
                         .setTitle("Close paywall ?")
                         .setPositiveButton("Close") { dialog, _ ->
                             processAction(true)
