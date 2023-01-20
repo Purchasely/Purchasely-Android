@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
         Purchasely.Builder(applicationContext)
                 //TODO set your api key
-                .apiKey("afa96c76-1d8e-4e3c-a48f-204a3cd93a15")
+                .apiKey("fcb39be4-2ba4-4db7-bde3-2a5a1e20745d")
                 .eventListener(eventListener)
                 .userId(null) //you can set an user id if you have one
                 .logLevel(LogLevel.DEBUG) //set to ERROR in production
@@ -54,6 +54,8 @@ class MainActivity : AppCompatActivity() {
         buttonDisplayFeatureList.setOnClickListener { startActivity(Intent(applicationContext, FeatureListActivity::class.java)) }
         buttonDisplayCompose.setOnClickListener { startActivity(Intent(applicationContext, ComposeActivity::class.java)) }
         buttonSubscriptions.setOnClickListener { startActivity(Intent(applicationContext, SubscriptionsActivity::class.java)) }
+        buttonDisplayAsync.setOnClickListener { startActivity(Intent(applicationContext, PresentationAsyncActivity::class.java)) }
+        buttonDisplayClientPaywall.setOnClickListener { startActivity(Intent(applicationContext, ClientActivity::class.java)) }
 
         buttonRestore.setOnClickListener {
             Purchasely.restoreAllProducts(

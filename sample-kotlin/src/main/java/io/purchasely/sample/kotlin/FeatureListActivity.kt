@@ -1,26 +1,15 @@
 package io.purchasely.sample.kotlin
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.core.view.setPadding
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.android.billingclient.api.Purchase
 import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.*
 import io.purchasely.sample.R
-import io.purchasely.views.px
 import kotlinx.android.synthetic.main.activity_feature_list.*
 
 class FeatureListActivity : FragmentActivity() {

@@ -16,7 +16,7 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        applicationId "io.purchasely.sample"
+        applicationId "com.purchasely.demo"
         minSdkVersion 22
         targetSdkVersion 33
         versionCode 2

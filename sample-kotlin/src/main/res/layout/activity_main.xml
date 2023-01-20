@@ -47,6 +47,26 @@
             app:layout_constraintTop_toBottomOf="@+id/buttonDisplayFeatureList" />
 
         <Button
+            android:id="@+id/buttonDisplayAsync"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Display Paywall Async"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonDisplayCompose" />
+
+        <Button
+            android:id="@+id/buttonDisplayClientPaywall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Display My Paywall"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonDisplayAsync" />
+
+        <Button
             android:id="@+id/buttonSubscriptions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +74,7 @@
             android:text="Subscriptions"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonDisplayCompose" />
+            app:layout_constraintTop_toBottomOf="@+id/buttonDisplayClientPaywall" />
 
         <Button
             android:id="@+id/buttonRestore"
