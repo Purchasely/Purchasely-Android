@@ -35,6 +35,7 @@ public class FeatureListActivity extends AppCompatActivity {
                             "Purchased result is $result with plan " + vendorId,
                             Snackbar.LENGTH_LONG)
                             .show();
+                    return null;
                 }
         );
 
