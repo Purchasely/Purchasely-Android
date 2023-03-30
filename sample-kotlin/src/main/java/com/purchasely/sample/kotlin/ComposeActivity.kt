@@ -1,4 +1,4 @@
-package io.purchasely.sample.kotlin
+package com.purchasely.sample.kotlin
 
 import android.os.Bundle
 import android.widget.FrameLayout
@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import io.purchasely.ext.Purchasely
-import io.purchasely.sample.kotlin.ui.theme.AndroidPublicTheme
+import com.purchasely.sample.kotlin.ui.theme.AndroidPublicTheme
 
 class ComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

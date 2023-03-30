@@ -1,4 +1,4 @@
-package io.purchasely.sample.kotlin
+package com.purchasely.sample.kotlin
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +9,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import io.purchasely.ext.*
 import io.purchasely.models.PLYPlan
-import io.purchasely.sample.R
+import com.purchasely.sample.R
 import kotlinx.coroutines.launch
 
 class PresentationAsyncActivity : AppCompatActivity() {

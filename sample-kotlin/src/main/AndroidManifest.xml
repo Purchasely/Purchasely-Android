@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.purchasely.sample">
+    package="com.purchasely.sample">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -12,12 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="io.purchasely.sample.kotlin.ComposeActivity"
+            android:name=".kotlin.ComposeActivity"
             android:exported="false"
             android:label="@string/title_activity_compose"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="io.purchasely.sample.kotlin.MainActivity"
+            android:name=".kotlin.MainActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -27,17 +27,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="io.purchasely.sample.kotlin.FeatureListActivity"
+            android:name=".kotlin.FeatureListActivity"
             android:exported="true" />
         <activity
-            android:name="io.purchasely.sample.kotlin.SubscriptionsActivity"
+            android:name=".kotlin.SubscriptionsActivity"
             android:exported="true" />
         <activity
-            android:name="io.purchasely.sample.kotlin.PresentationAsyncActivity"
+            android:name=".kotlin.PresentationAsyncActivity"
             android:exported="true"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="io.purchasely.sample.kotlin.ClientActivity"
+            android:name=".kotlin.ClientActivity"
             android:exported="true"
             android:theme="@style/AppTheme" />
     </application>

@@ -1,4 +1,4 @@
-package io.purchasely.sample.kotlin
+package com.purchasely.sample.kotlin
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.*
 import io.purchasely.models.PLYPlan
-import io.purchasely.sample.R
+import com.purchasely.sample.R
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.coroutines.launch
 

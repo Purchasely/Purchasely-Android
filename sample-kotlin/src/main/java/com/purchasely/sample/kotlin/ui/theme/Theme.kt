@@ -1,4 +1,4 @@
-package io.purchasely.sample.kotlin.ui.theme
+package com.purchasely.sample.kotlin.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

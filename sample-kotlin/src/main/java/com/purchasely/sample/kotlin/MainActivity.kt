@@ -1,4 +1,4 @@
-package io.purchasely.sample.kotlin
+package com.purchasely.sample.kotlin
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.purchasely.ext.*
 import io.purchasely.google.GoogleStore
 import io.purchasely.models.PLYPlan
-import io.purchasely.sample.R
+import com.purchasely.sample.R
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch

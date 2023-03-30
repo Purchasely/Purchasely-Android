@@ -1,4 +1,4 @@
-package io.purchasely.sample.kotlin
+package com.purchasely.sample.kotlin
 
 import android.os.Bundle
 import android.util.Log
@@ -9,7 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.*
-import io.purchasely.sample.R
+import com.purchasely.sample.R
 import kotlinx.android.synthetic.main.activity_feature_list.*
 
 class FeatureListActivity : FragmentActivity() {

@@ -25,7 +25,7 @@ import io.purchasely.ext.Purchasely;
 import io.purchasely.google.GoogleStore;
 import io.purchasely.models.PLYPlan;
 import io.purchasely.models.PLYProduct;
-import io.purchasely.sample.R;
+import com.purchasely.sample.R;
 
 public class MainActivity extends AppCompatActivity {
 

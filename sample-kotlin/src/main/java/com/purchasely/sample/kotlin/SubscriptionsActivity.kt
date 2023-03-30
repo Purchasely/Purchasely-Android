@@ -1,10 +1,10 @@
-package io.purchasely.sample.kotlin
+package com.purchasely.sample.kotlin
 
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import io.purchasely.ext.Purchasely
-import io.purchasely.sample.R
+import com.purchasely.sample.R
 import kotlinx.android.synthetic.main.activity_feature_list.*
 
 class SubscriptionsActivity : FragmentActivity() {

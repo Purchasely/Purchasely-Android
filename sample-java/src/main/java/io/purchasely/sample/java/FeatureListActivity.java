@@ -13,7 +13,7 @@ import com.google.android.material.snackbar.Snackbar;
 import org.jetbrains.annotations.NotNull;
 
 import io.purchasely.ext.Purchasely;
-import io.purchasely.sample.R;
+import com.purchasely.sample.R;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
