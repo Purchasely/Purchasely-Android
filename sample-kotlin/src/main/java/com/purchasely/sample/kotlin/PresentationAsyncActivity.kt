@@ -18,26 +18,15 @@ class PresentationAsyncActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_presentations_async)
 
+        val properties = PLYPresentationViewProperties(
+            onLoaded = { isLoaded ->
+                if(isLoaded) findViewById<FrameLayout>(R.id.paywallFrame).isVisible = true
+                else supportFinishAfterTransition()
+            })
+
         lifecycleScope.launch {
             val presentation = try {
-                Purchasely.fetchPresentation(
-                    this@PresentationAsyncActivity,
-                    PLYPresentationViewProperties(
-                        placementId = "ONBOARDING",
-                        onLoaded = { isLoaded ->
-                            if(isLoaded) findViewById<FrameLayout>(R.id.paywallFrame).isVisible = true
-                            else supportFinishAfterTransition()
-                        }
-                    )) { result: PLYProductViewResult, plan: PLYPlan? ->
-                    //called when paywall is closed
-                    //Purchased and Restored are returned only if purchase was validated by Purchasely, Google and your backend (if webhook configured)
-                    when(result) {
-                        PLYProductViewResult.PURCHASED -> Log.d("Purchasely", "User purchased $plan, you can call your backend to refresh user information and grant his entitlements")
-                        PLYProductViewResult.RESTORED -> Log.d("Purchasely", "User restored $plan, you can call your backend to refresh user information and grant his entitlements")
-                        PLYProductViewResult.CANCELLED -> Log.d("Purchasely", "User closed paywall without purchasing")
-                    }
-                    supportFinishAfterTransition()
-                }
+                Purchasely.fetchPresentation(placementId = "ONBOARDING")
             } catch (e: Exception) {
                 Log.e("Purchasely", "Error fetching presentation", e)
                 null
@@ -47,7 +36,18 @@ class PresentationAsyncActivity : AppCompatActivity() {
                 PLYPresentationType.NORMAL,
                 PLYPresentationType.FALLBACK -> {
                     if(presentation.view == null) Log.d("Purchasely", "Error with view")
-                    findViewById<FrameLayout>(R.id.paywallFrame).addView(presentation.view)
+                    val paywallView = presentation.buildView(
+                        this@PresentationAsyncActivity, properties) { result: PLYProductViewResult, plan: PLYPlan? ->
+                        //called when paywall is closed
+                        //Purchased and Restored are returned only if purchase was validated by Purchasely, Google and your backend (if webhook configured)
+                        when(result) {
+                            PLYProductViewResult.PURCHASED -> Log.d("Purchasely", "User purchased $plan, you can call your backend to refresh user information and grant his entitlements")
+                            PLYProductViewResult.RESTORED -> Log.d("Purchasely", "User restored $plan, you can call your backend to refresh user information and grant his entitlements")
+                            PLYProductViewResult.CANCELLED -> Log.d("Purchasely", "User closed paywall without purchasing")
+                        }
+                        supportFinishAfterTransition()
+                    }
+                    findViewById<FrameLayout>(R.id.paywallFrame).addView(paywallView)
                 }
                 PLYPresentationType.DEACTIVATED -> supportFinishAfterTransition()
                 PLYPresentationType.CLIENT -> startActivity(Intent(applicationContext, ClientActivity::class.java))
