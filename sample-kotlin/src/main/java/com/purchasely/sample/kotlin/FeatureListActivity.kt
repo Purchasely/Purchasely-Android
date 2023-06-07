@@ -38,7 +38,7 @@ class FeatureListActivity : FragmentActivity() {
         val paywallView = Purchasely.presentationView(
             this,
             PLYPresentationViewProperties(
-                placementId = "ACCOUNT",
+                placementId = "abtest",
                 contentId = "my_content_id which is optional",
                 displayCloseButton = true, //true by default, you can set to false if you never want it displayed
                 onLoaded = { isLoaded ->
@@ -97,6 +97,11 @@ class FeatureListActivity : FragmentActivity() {
          * false otherwise
          */
         Purchasely.setPaywallActionsInterceptor { info, action, parameters, processAction ->
+
+            if(info?.activity != this@FeatureListActivity) {
+                return@setPaywallActionsInterceptor
+            }
+
             when(action) {
                 PLYPresentationAction.PURCHASE -> {
                     //display an alert dialog

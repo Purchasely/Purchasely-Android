@@ -10,12 +10,9 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import org.jetbrains.annotations.NotNull;
 
 import io.purchasely.ext.Purchasely;
-import com.purchasely.sample.R;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
+import io.purchasely.sample.R;
 
 public class FeatureListActivity extends AppCompatActivity {
     @Override
@@ -29,7 +26,7 @@ public class FeatureListActivity extends AppCompatActivity {
                 null,
                 loaded -> null, //callback when fragment is ready to be displayed
                 (plyProductViewResult, plyPlan) -> {
-                    String vendorId = plyPlan.getVendorId();
+                    String vendorId = plyPlan != null ? plyPlan.getVendorId() : null;
                     Snackbar.make(
                             getWindow().getDecorView(),
                             "Purchased result is $result with plan " + vendorId,

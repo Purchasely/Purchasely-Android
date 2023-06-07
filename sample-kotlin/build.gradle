@@ -55,9 +55,6 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    lintOptions {
-        abortOnError false
-    }
     buildFeatures {
         compose true
     }
@@ -68,6 +65,10 @@ android {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
+    }
+    namespace 'com.purchasely.sample'
+    lint {
+        abortOnError false
     }
 
 }

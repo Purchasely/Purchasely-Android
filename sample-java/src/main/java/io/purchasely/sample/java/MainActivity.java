@@ -20,12 +20,10 @@ import java.util.List;
 import io.purchasely.billing.Store;
 import io.purchasely.ext.LogLevel;
 import io.purchasely.ext.PLYRunningMode;
-import io.purchasely.ext.ProductsListener;
 import io.purchasely.ext.Purchasely;
 import io.purchasely.google.GoogleStore;
 import io.purchasely.models.PLYPlan;
-import io.purchasely.models.PLYProduct;
-import com.purchasely.sample.R;
+import io.purchasely.sample.R;
 
 public class MainActivity extends AppCompatActivity {
 
