@@ -26,32 +26,24 @@ class PresentationAsyncActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val presentation = try {
-                Purchasely.fetchPresentation(placementId = "ONBOARDING")
+                Purchasely.fetchPresentationForPlacement(this@PresentationAsyncActivity, placementId = "ONBOARDING") {
+                    presentation, error ->
+                }
             } catch (e: Exception) {
                 Log.e("Purchasely", "Error fetching presentation", e)
                 null
             } ?: return@launch
 
-            when(presentation.type) {
+            /*when(presentation.type) {
                 PLYPresentationType.NORMAL,
                 PLYPresentationType.FALLBACK -> {
                     if(presentation.view == null) Log.d("Purchasely", "Error with view")
-                    val paywallView = presentation.buildView(
-                        this@PresentationAsyncActivity, properties) { result: PLYProductViewResult, plan: PLYPlan? ->
-                        //called when paywall is closed
-                        //Purchased and Restored are returned only if purchase was validated by Purchasely, Google and your backend (if webhook configured)
-                        when(result) {
-                            PLYProductViewResult.PURCHASED -> Log.d("Purchasely", "User purchased $plan, you can call your backend to refresh user information and grant his entitlements")
-                            PLYProductViewResult.RESTORED -> Log.d("Purchasely", "User restored $plan, you can call your backend to refresh user information and grant his entitlements")
-                            PLYProductViewResult.CANCELLED -> Log.d("Purchasely", "User closed paywall without purchasing")
-                        }
-                        supportFinishAfterTransition()
-                    }
+                    val paywallView = presentation.view ?: return@launch
                     findViewById<FrameLayout>(R.id.paywallFrame).addView(paywallView)
                 }
                 PLYPresentationType.DEACTIVATED -> supportFinishAfterTransition()
                 PLYPresentationType.CLIENT -> startActivity(Intent(applicationContext, ClientActivity::class.java))
-            }
+            }*/
         }
     }
 

@@ -49,6 +49,10 @@ class MainActivity : AppCompatActivity() {
         //make sure no user is saved if none is logged in
         Purchasely.userLogout()
 
+        lifecycleScope.launch {
+            Purchasely.userSubscriptions()
+        }
+
         //Purchasely.playerView = "io.purchasely.player.PLYPlayerView"
 
         buttonDisplayFeatureList.setOnClickListener { startActivity(Intent(applicationContext, FeatureListActivity::class.java)) }

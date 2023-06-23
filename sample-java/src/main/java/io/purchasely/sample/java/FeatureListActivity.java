@@ -3,6 +3,7 @@ package io.purchasely.sample.java;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,8 @@ import com.google.android.material.snackbar.Snackbar;
 
 import io.purchasely.ext.Purchasely;
 import io.purchasely.sample.R;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 public class FeatureListActivity extends AppCompatActivity {
     @Override
@@ -21,24 +24,29 @@ public class FeatureListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_feature_list);
 
         //TODO set the product id you want to display
-        Fragment fragment = Purchasely.presentationFragment(
-                null, //Presentation Id, may be null for default
+
+        View view = Purchasely.presentationViewForPlacement(
+                this,
+                "onboarding",//Presentation Id, may be null for default
                 null,
-                loaded -> null, //callback when fragment is ready to be displayed
+                loaded -> null,
+                () -> {
+                    ((FrameLayout) findViewById(R.id.container)).removeAllViews();
+                    supportFinishAfterTransition();
+                    return null;
+                },
                 (plyProductViewResult, plyPlan) -> {
                     String vendorId = plyPlan != null ? plyPlan.getVendorId() : null;
                     Snackbar.make(
-                            getWindow().getDecorView(),
-                            "Purchased result is $result with plan " + vendorId,
-                            Snackbar.LENGTH_LONG)
+                                    getWindow().getDecorView(),
+                                    "Purchased result is $result with plan " + vendorId,
+                                    Snackbar.LENGTH_LONG)
                             .show();
                     return null;
                 }
         );
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.inappFragment, fragment, "InAppFragment")
-                .commitAllowingStateLoss();
+        ((FrameLayout) findViewById(R.id.container)).addView(view);
 
         findViewById(R.id.progressBar).setVisibility(View.GONE);
 
