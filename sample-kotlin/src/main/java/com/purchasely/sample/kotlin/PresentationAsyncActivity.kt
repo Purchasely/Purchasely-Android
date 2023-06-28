@@ -19,31 +19,32 @@ class PresentationAsyncActivity : AppCompatActivity() {
         setContentView(R.layout.activity_presentations_async)
 
         val properties = PLYPresentationViewProperties(
+            placementId = "ONBOARDING",
             onLoaded = { isLoaded ->
                 if(isLoaded) findViewById<FrameLayout>(R.id.paywallFrame).isVisible = true
                 else supportFinishAfterTransition()
-            })
+            },
+            onClose = { supportFinishAfterTransition() }
+        )
 
         lifecycleScope.launch {
             val presentation = try {
-                Purchasely.fetchPresentationForPlacement(this@PresentationAsyncActivity, placementId = "ONBOARDING") {
-                    presentation, error ->
-                }
+                Purchasely.fetchPresentation(properties = properties)
             } catch (e: Exception) {
                 Log.e("Purchasely", "Error fetching presentation", e)
                 null
             } ?: return@launch
 
-            /*when(presentation.type) {
+            when(presentation.type) {
                 PLYPresentationType.NORMAL,
                 PLYPresentationType.FALLBACK -> {
                     if(presentation.view == null) Log.d("Purchasely", "Error with view")
-                    val paywallView = presentation.view ?: return@launch
+                    val paywallView = presentation.buildView(this@PresentationAsyncActivity) ?: return@launch
                     findViewById<FrameLayout>(R.id.paywallFrame).addView(paywallView)
                 }
                 PLYPresentationType.DEACTIVATED -> supportFinishAfterTransition()
                 PLYPresentationType.CLIENT -> startActivity(Intent(applicationContext, ClientActivity::class.java))
-            }*/
+            }
         }
     }
 
