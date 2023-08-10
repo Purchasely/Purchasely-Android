@@ -18,11 +18,6 @@ class FeatureListActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
-        //You can use a fragment (deprecated) or use a view
-        val paywallFragment = Purchasely.presentationFragmentForPlacement("ACCOUNT", null, null) { result, plan ->
-            Log.d("PurchaselyDemo", "Purchased result is $result with plan ${plan?.vendorId}")
-        } ?: return
-
         //You can also display the presentation for a specific product or plan
         //Purchasely.productFragment("productId", "presentationId or null for default")
         //Purchasely.planFragment("planId", "presentationId or null for default")

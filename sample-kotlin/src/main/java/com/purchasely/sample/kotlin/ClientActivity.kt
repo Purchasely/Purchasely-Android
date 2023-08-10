@@ -27,8 +27,8 @@ class ClientActivity : AppCompatActivity() {
     private val adapter by lazy {
         Adapter { plan, observer ->
             //Purchase with Purchasely or your own service
-            Purchasely.purchase(this, plan, "content_id_client",
-                success = {
+            Purchasely.purchase(this, plan, null, "content_id_client",
+                onSuccess = {
                     Toast.makeText(applicationContext, "Bought ${it?.name}", Toast.LENGTH_SHORT).show()
 
                     //If you do not use Purchasely to purchase, call synchronize() method
@@ -36,7 +36,7 @@ class ClientActivity : AppCompatActivity() {
 
                     supportFinishAfterTransition()
                 },
-                error = {
+                onError = {
                     PLYLogger.log("Error buying ${plan.name}")
                     Toast.makeText(applicationContext, "Error $it", Toast.LENGTH_SHORT).show()
                 }
@@ -60,7 +60,7 @@ class ClientActivity : AppCompatActivity() {
             }
         }*/
 
-        Purchasely.fetchPresentationForPlacement(this, "client") { presentation, error ->
+        Purchasely.fetchPresentationForPlacement( "client") { presentation, error ->
             this.presentation = presentation
             if(presentation?.type == PLYPresentationType.CLIENT) {
                 Purchasely.clientPresentationDisplayed(presentation)

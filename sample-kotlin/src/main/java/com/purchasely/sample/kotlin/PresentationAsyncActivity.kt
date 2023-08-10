@@ -38,7 +38,6 @@ class PresentationAsyncActivity : AppCompatActivity() {
             when(presentation.type) {
                 PLYPresentationType.NORMAL,
                 PLYPresentationType.FALLBACK -> {
-                    if(presentation.view == null) Log.d("Purchasely", "Error with view")
                     val paywallView = presentation.buildView(this@PresentationAsyncActivity) ?: return@launch
                     findViewById<FrameLayout>(R.id.paywallFrame).addView(paywallView)
                 }

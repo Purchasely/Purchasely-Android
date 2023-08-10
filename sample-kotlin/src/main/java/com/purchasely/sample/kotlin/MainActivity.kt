@@ -34,10 +34,9 @@ class MainActivity : AppCompatActivity() {
         Purchasely.Builder(applicationContext)
                 //TODO set your api key
                 .apiKey("fcb39be4-2ba4-4db7-bde3-2a5a1e20745d")
-                .eventListener(eventListener)
                 .userId(null) //you can set an user id if you have one
                 .logLevel(LogLevel.DEBUG) //set to ERROR in production
-                .isReadyToPurchase(true) //to open paywalls from deeplinks
+                .readyToOpenDeeplink(true) //to open paywalls from deeplinks
                 .runningMode(PLYRunningMode.Full) //set to PLYRunningMode.PaywallObserver if you keep your transaction stack
                 .stores(listOf(GoogleStore()))
                 .build()
@@ -45,6 +44,8 @@ class MainActivity : AppCompatActivity() {
                     if(isConfigured) Log.d("Purchasely", "You can display paywalls and make purchases")
                     if(error != null) Log.e("Purchasely", "Configuration error", error)
                 }
+
+        Purchasely.eventListener = eventListener
 
         //make sure no user is saved if none is logged in
         Purchasely.userLogout()
@@ -63,10 +64,10 @@ class MainActivity : AppCompatActivity() {
 
         buttonRestore.setOnClickListener {
             Purchasely.restoreAllProducts(
-                    success = { plan ->
+                    onSuccess = { plan ->
                         Log.e("Sample", "Restored $plan")
                     },
-                    error = { error ->
+                    onError = { error ->
                         Log.e("Sample", "Restoration failed $error")
 
                     }
@@ -181,7 +182,7 @@ class Holder(override val containerView: TextView) : RecyclerView.ViewHolder(con
             append("\n")
             append(String.format("Trial Duration: %s", plan.localizedTrialDuration()))
             append("\n")
-            append(String.format("Numeric Price: %s", plan.price()))
+            append(String.format("Numeric Price: %s", plan.amount()))
             append("\n")
             append(String.format("Price Currency: %s", plan.currencyCode()))
             append("\n")
