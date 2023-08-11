@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 //TODO set your api key
                 .apiKey("afa96c76-1d8e-4e3c-a48f-204a3cd93a15")
                 .logLevel(LogLevel.DEBUG)
-                .isReadyToPurchase(true)
+                .readyToOpenDeeplink(true)
                 .runningMode(PLYRunningMode.Full.INSTANCE)
                 .stores(stores)
                 .build();
@@ -126,17 +126,17 @@ public class MainActivity extends AppCompatActivity {
             content.append("\n");
             content.append(String.format("Period: %s", plan.localizedPeriod()));
             content.append("\n");
-            content.append(String.format("Full introductory price: %s", plan.localizedFullIntroductoryPrice()));
+            content.append(String.format("Full introductory price: %s", plan.localizedFullIntroductoryPrice(null)));
             content.append("\n");
-            content.append(String.format("Introductory Price: %s", plan.localizedIntroductoryPrice(false)));
+            content.append(String.format("Introductory Price: %s", plan.localizedIntroductoryPrice(false, null)));
             content.append("\n");
-            content.append(String.format("Introductory Period: %s", plan.localizedIntroductoryPeriod()));
+            content.append(String.format("Introductory Period: %s", plan.localizedIntroductoryPeriod(null)));
             content.append("\n");
-            content.append(String.format("Introductory Duration: %s", plan.localizedIntroductoryDuration()));
+            content.append(String.format("Introductory Duration: %s", plan.localizedIntroductoryDuration(null)));
             content.append("\n");
-            content.append(String.format("Trial Period: %s", plan.localizedTrialDuration()));
+            content.append(String.format("Trial Period: %s", plan.localizedTrialDuration(null)));
             content.append("\n");
-            content.append(String.format("Numeric Price: %s", plan.price()));
+            content.append(String.format("Numeric Price: %s", plan.amount(null)));
             content.append("\n");
             content.append(String.format("Currency Symbol: %s", plan.currencySymbol()));
             content.append("\n");
