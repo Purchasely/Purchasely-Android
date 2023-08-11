@@ -18,11 +18,21 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file('../sample_keystore.keystore')
+            storePassword 'cmKeystore'
+            keyAlias 'cm_key_alias'
+            keyPassword 'cmKeystore'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
