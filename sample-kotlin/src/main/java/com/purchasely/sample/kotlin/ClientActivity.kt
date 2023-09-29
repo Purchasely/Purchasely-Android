@@ -66,7 +66,7 @@ class ClientActivity : AppCompatActivity() {
                 Purchasely.clientPresentationDisplayed(presentation)
 
                 lifecycleScope.launch {
-                    adapter.list.addAll(presentation.plans.mapNotNull { Purchasely.plan(it) })
+                    adapter.list.addAll(presentation.plans.mapNotNull { Purchasely.plan(it.planVendorId!!) })
                     adapter.notifyDataSetChanged()
                 }
             } else {
