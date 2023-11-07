@@ -1,17 +1,21 @@
 package com.purchasely.samplev2.presentation.screen.attributes
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.purchasely.samplev2.presentation.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.purchasely.ext.Purchasely
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 /**
  * Home viewModel, providing [AttributesUiState] and methods for [AttributesScreen].
  */
 @HiltViewModel
-class AttributesViewModel @Inject constructor(): ViewModel() {
+class AttributesViewModel @Inject constructor() : ViewModel() {
 
     val uiState = MutableStateFlow(AttributesUiState())
 
@@ -22,12 +26,31 @@ class AttributesViewModel @Inject constructor(): ViewModel() {
     /**
      * Add a new user attribute.
      */
-    fun addAttribute(key: String, value: Any) {
-        when(value) {
-            is Int -> Purchasely.setUserAttribute(key, value)
-            is Float -> Purchasely.setUserAttribute(key, value)
-            is String -> Purchasely.setUserAttribute(key, value)
-            is Date -> Purchasely.setUserAttribute(key, value)
+    fun addAttribute(key: String, value: String, type: String) {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+        when (type) {
+            Integer::class.simpleName -> value.toIntOrNull()?.let {
+                Purchasely.setUserAttribute(key, it)
+            }
+
+            Float::class.simpleName -> value.toFloatOrNull()?.let {
+                Purchasely.setUserAttribute(key, it)
+            }
+
+            Boolean::class.simpleName -> value.toBooleanStrictOrNull()?.let {
+                Purchasely.setUserAttribute(key, it)
+            }
+
+            String::class.simpleName -> Purchasely.setUserAttribute(key, value)
+            Date::class.simpleName -> {
+                try {
+                    dateFormat.parse(value)?.let {
+                        Purchasely.setUserAttribute(key, it)
+                    }
+                } catch (e: Exception) {
+                    Log.e(Constants.TAG, "Unable to parse date $value", e)
+                }
+            }
         }
         refreshAttributes()
     }

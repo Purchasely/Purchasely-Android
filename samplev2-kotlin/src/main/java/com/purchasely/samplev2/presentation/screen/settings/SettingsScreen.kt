@@ -1,35 +1,44 @@
 package com.purchasely.samplev2.presentation.screen.settings
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.shapes
-import androidx.compose.runtime.*
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
-import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.purchasely.demo.R
+import com.purchasely.samplev2.R
 import com.purchasely.samplev2.presentation.common.CommonDropdownMenu
+import com.purchasely.samplev2.presentation.common.CommonSwitchOption
 import com.purchasely.samplev2.presentation.common.CommonTextField
 import com.purchasely.samplev2.presentation.common.DropDownCommonTextField
 import com.purchasely.samplev2.presentation.common.drawTwoColors
 import com.purchasely.samplev2.presentation.navigation.Screen
 import com.purchasely.samplev2.presentation.theme.Gray100
-import com.purchasely.samplev2.presentation.theme.Gray500
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = hiltViewModel()) {
     val systemUiController = rememberSystemUiController()
@@ -132,15 +141,7 @@ fun SwitchsCard(uiState: SettingsUiState) {
             .clip(shape = shapes.medium)
             .padding(start = 16.dp, end = 16.dp, bottom = 20.dp)
     ) {
-        SwitchOption(
-            label = "PRODUCTION",
-            isEnabled = uiState.isProductionMode,
-            onCheckedChange = {
-                uiState.isProductionMode = it
-                uiState.needRestart = true
-            }
-        )
-        SwitchOption(
+        CommonSwitchOption(
             label = "OBSERVER MODE",
             isEnabled = uiState.isObserverMode,
             onCheckedChange = {
@@ -148,39 +149,10 @@ fun SwitchsCard(uiState: SettingsUiState) {
                 uiState.needRestart = true
             }
         )
-        SwitchOption(
+        CommonSwitchOption(
             label = "ASYNC LOADING",
             isEnabled = uiState.isAsyncLoading,
             onCheckedChange = { uiState.isAsyncLoading = it }
-        )
-    }
-}
-
-@Composable
-fun SwitchOption(label: String, isEnabled: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    val switchState = remember { mutableStateOf(isEnabled) }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(text = label, fontSize = 12.sp, fontWeight = SemiBold, color = Gray500)
-
-        Switch(
-            checked = switchState.value,
-            onCheckedChange = {
-                switchState.value = it
-                onCheckedChange(it)
-            },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = colorScheme.primary,
-                checkedTrackColor = colorScheme.primary.copy(alpha = 0.5f),
-                uncheckedThumbColor = colorScheme.onSurface.copy(alpha = 0.5f),
-                uncheckedTrackColor = colorScheme.onSurface.copy(alpha = 0.12f)
-            ),
-            modifier = Modifier.padding(end = 16.dp)
         )
     }
 }
@@ -209,26 +181,6 @@ fun URLsCard(uiState: SettingsUiState) {
                         uiState.needRestart = true
                     }
                 )
-                CommonTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = "Api Url",
-                    value = uiState.apiUrl,
-                    keyboardType = KeyboardType.Uri,
-                    onValueChange = {
-                        uiState.apiUrl = it
-                        uiState.needRestart = true
-                    }
-                )
-                CommonTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = "Paywall Url",
-                    value = uiState.paywallUrl,
-                    keyboardType = KeyboardType.Uri,
-                    onValueChange = {
-                        uiState.paywallUrl = it
-                        uiState.needRestart = true
-                    }
-                )
             }
         }
     }
@@ -250,10 +202,10 @@ fun DropdownsCard(uiState: SettingsUiState) {
         ) {
             CommonDropdownMenu(
                 modifier = Modifier.fillMaxWidth(),
-                label = "Template",
-                items = uiState.templatesList,
-                selected = uiState.template,
-                onItemChange = { uiState.template = it }
+                label = "Theme Color",
+                items = uiState.themesList,
+                selected = uiState.theme,
+                onItemChange = { uiState.theme = it }
             )
             CommonDropdownMenu(
                 modifier = Modifier.fillMaxWidth(),

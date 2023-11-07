@@ -31,4 +31,6 @@ interface PreferencesRepository {
      * Retrieve the [String] history associated with [key].
      */
     fun getHistory(key: String): List<String>
+
+    fun removeKey(key: String): Boolean
 }

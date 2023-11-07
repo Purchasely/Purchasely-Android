@@ -8,8 +8,6 @@ import io.purchasely.ext.PLYPresentationViewProperties
  */
 data class PaywallUiState(
 
-    var template: String? = null,
-
     var placementId: String? = null,
 
     var presentationId: String? = null,

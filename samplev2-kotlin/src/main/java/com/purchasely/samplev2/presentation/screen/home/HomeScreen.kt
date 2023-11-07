@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ManageAccounts
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,7 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.purchasely.demo.R
+import com.purchasely.samplev2.R
 import com.purchasely.samplev2.presentation.navigation.Screen
 import com.purchasely.samplev2.presentation.screen.subscriptions.SubscriptionsActivity
 import com.purchasely.samplev2.presentation.theme.Purple100

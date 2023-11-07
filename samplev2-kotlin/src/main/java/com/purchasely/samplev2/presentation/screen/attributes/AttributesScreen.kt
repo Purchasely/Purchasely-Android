@@ -1,7 +1,7 @@
 package com.purchasely.samplev2.presentation.screen.attributes
 
 import android.app.DatePickerDialog
-import android.widget.DatePicker
+import android.app.TimePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +61,7 @@ import com.purchasely.samplev2.presentation.theme.Gray700
 import com.purchasely.samplev2.presentation.theme.Red500
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -72,8 +73,8 @@ fun AttributesScreen(navController: NavController, viewModel: AttributesViewMode
             title = "User Attributes",
             onBackClick = { navController.navigateUp() }
         )
-        AttributeInputCard { key, value ->
-            viewModel.addAttribute(key, value)
+        AttributeInputCard { key, value, type ->
+            viewModel.addAttribute(key, value, type)
         }
 
         AttributesList(attributes.value.attributes) {
@@ -84,10 +85,10 @@ fun AttributesScreen(navController: NavController, viewModel: AttributesViewMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AttributeInputCard(onAddAttributeClick: (String, Any) -> Unit) {
+fun AttributeInputCard(onAddAttributeClick: (String, String, String) -> Unit) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
     val typeList = listOf("String", "Int", "Float", "Boolean", "Date")
 
     var attributeKey by remember { mutableStateOf("") }
@@ -155,11 +156,11 @@ fun AttributeInputCard(onAddAttributeClick: (String, Any) -> Unit) {
                     }
 
                     "Boolean" -> {
-                        attributeValue = "True"
+                        attributeValue = "true"
                         CommonDropdownMenu(
                             Modifier.weight(1f),
                             label = "Value",
-                            items = listOf("True", "False"),
+                            items = listOf("true", "false"),
                             selected = attributeValue
                         ) {
                             attributeValue = it
@@ -168,11 +169,24 @@ fun AttributeInputCard(onAddAttributeClick: (String, Any) -> Unit) {
 
                     "Date" -> {
                         val calendar = Calendar.getInstance()
-                        val picker = DatePickerDialog(
+                        val datePicker = DatePickerDialog(
                             context,
-                            { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+                            { _, year, month, dayOfMonth ->
                                 calendar.set(year, month, dayOfMonth)
-                                attributeValue = dateFormat.format(calendar.time)
+
+                                val timePicker = TimePickerDialog(
+                                    context,
+                                    { _, hourOfDay, minute ->
+                                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                                        calendar.set(Calendar.MINUTE, minute)
+
+                                        attributeValue = dateFormat.format(calendar.time)
+                                    },
+                                    calendar.get(Calendar.HOUR_OF_DAY),
+                                    calendar.get(Calendar.MINUTE),
+                                    true // Use true if you want to display 24-hour format
+                                )
+                                timePicker.show()
                             },
                             calendar.get(Calendar.YEAR),
                             calendar.get(Calendar.MONTH),
@@ -200,7 +214,7 @@ fun AttributeInputCard(onAddAttributeClick: (String, Any) -> Unit) {
                                 modifier = Modifier
                                     .matchParentSize()
                                     .alpha(0f)
-                                    .clickable(onClick = { picker.show() }),
+                                    .clickable(onClick = { datePicker.show() }),
                             )
                         }
                     }
@@ -209,7 +223,7 @@ fun AttributeInputCard(onAddAttributeClick: (String, Any) -> Unit) {
             Button(
                 enabled = attributeKey.isNotBlank().and(attributeValue.isNotBlank()),
                 onClick = {
-                    onAddAttributeClick(attributeKey, attributeValue)
+                    onAddAttributeClick(attributeKey, attributeValue, attributeType)
                     focusManager.clearFocus()
                     attributeKey = ""
                     attributeValue = ""
@@ -226,15 +240,21 @@ fun AttributeInputCard(onAddAttributeClick: (String, Any) -> Unit) {
 
 @Composable
 fun AttributesList(attributes: Map<String, Any>, onRemoveClick: (String) -> Unit) {
+    val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
         if (attributes.isNotEmpty()) {
             items(attributes.toList()) { attribute ->
+                val value = if(attribute.second is Date) {
+                    formatter.format(attribute.second)
+                } else {
+                    attribute.second
+                }
                 AttributeItem(
                     key = attribute.first,
-                    value = "${attribute.second}",
+                    value = "$value",
                     onRemoveClick = {
                         onRemoveClick(attribute.first)
                     }

@@ -8,7 +8,7 @@ data class SettingsUiState(
 
     val storesList: MutableList<String> = mutableListOf(""),
 
-    var apiKey: String = "fcb39be4-2ba4-4db7-bde3-2a5a1e20745d",
+    var apiKey: String = "",
 
     var productId: String = "",
 
@@ -22,23 +22,19 @@ data class SettingsUiState(
 
     var presentationId: String = "",
 
-    var apiUrl: String = "",
-
-    var paywallUrl: String = "",
-
-    var template: String = "",
-
     var store: String = "",
 
     var isObserverMode: Boolean = false,
 
     var isAsyncLoading: Boolean = false,
 
-    var isProductionMode: Boolean = false,
-
     var needRestart: Boolean = false,
 
     var placementHistory: List<String> = emptyList(),
 
-    var presentationHistory: List<String> = emptyList()
+    var presentationHistory: List<String> = emptyList(),
+
+    val themesList: List<String> = listOf("LIGHT", "DARK", "SYSTEM"),
+
+    var theme: String = ""
 )

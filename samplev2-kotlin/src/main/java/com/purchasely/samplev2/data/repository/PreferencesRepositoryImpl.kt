@@ -12,7 +12,7 @@ class PreferencesRepositoryImpl @Inject constructor(
 
     private val sharedPreferences: SharedPreferences by lazy {
         context.getSharedPreferences(
-            "com.purchasely.samplev2.preferences",
+            "com.purchasely.demo.samplev2.preferences",
             Context.MODE_PRIVATE
         )
     }
@@ -51,6 +51,10 @@ class PreferencesRepositoryImpl @Inject constructor(
         return sharedPreferences.getStringSet(key, setOf())?.toList() ?: emptyList()
     }
 
+    override fun removeKey(key: String): Boolean {
+        return sharedPreferences.edit().remove(key).commit()
+    }
+
     companion object {
         /**
          * Preferences keys.
@@ -61,16 +65,13 @@ class PreferencesRepositoryImpl @Inject constructor(
         const val PLACEMENT_ID = "placementId"
         const val PRESENTATION_ID = "presentationId"
         const val CONTENT_ID = "contentId"
-        const val IS_PRODUCTION_MODE = "productionMode"
         const val IS_OBSERVER_MODE = "observerMode"
         const val IS_ASYNC_LOADING = "asyncLoading"
-        const val PAYWALL_URL = "paywallUrl"
-        const val API_URL = "apiUrl"
         const val API_KEY = "apiKey"
-        const val TEMPLATE = "template"
         const val STORE = "store"
         const val HISTORY_PRESENTATION = "presentationHistory"
         const val HISTORY_PLACEMENT = "placementHistory"
+        const val THEME = "theme"
 
         /**
          * history max size.

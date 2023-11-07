@@ -2,21 +2,17 @@ package com.purchasely.samplev2
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.API_KEY
-import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.API_URL
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.IS_OBSERVER_MODE
-import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.IS_PRODUCTION_MODE
-import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.PAYWALL_URL
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.USER_ID
 import com.purchasely.samplev2.domain.preferences.PreferencesRepository
 import com.purchasely.samplev2.presentation.util.Constants.Companion.TAG
 import dagger.hilt.android.HiltAndroidApp
 import io.purchasely.ext.LogLevel
-import io.purchasely.ext.PLYAPIEnvironment
 import io.purchasely.ext.PLYRunningMode
 import io.purchasely.ext.Purchasely
 import io.purchasely.google.GoogleStore
-import io.purchasely.switchEnvironment
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -35,11 +31,6 @@ class SampleV2Application : Application() {
         }
 
         val userId = preferencesRepository.getString(USER_ID)
-        val apiUrl = preferencesRepository.getString(API_URL)
-        val paywallUrl = preferencesRepository.getString(PAYWALL_URL)
-        val isProductionMode = preferencesRepository.getBoolean(IS_PRODUCTION_MODE)
-
-        setEnvironment(isProductionMode, apiUrl, paywallUrl)
         startPurchasely(apiKey, userId)
     }
 
@@ -60,21 +51,9 @@ class SampleV2Application : Application() {
                     Log.d(TAG, "Purchasely configured successfully")
                 }
                 if (error != null) {
-                    Log.e(TAG, "Purchasely configuration error", error)
+                    Log.e(TAG, "Purchasely configuration error: $error")
+                    Toast.makeText(applicationContext, "Failed to start Purchasely SDK.", Toast.LENGTH_LONG).show()
                 }
             }
-    }
-
-    /**
-     * Set purchasely environment.
-     */
-    fun setEnvironment(isProduction: Boolean, apiUrl: String?, paywallUrl: String?) {
-        Purchasely.switchEnvironment(
-            when {
-                isProduction -> PLYAPIEnvironment.Production
-                apiUrl.isNullOrBlank().not() || paywallUrl.isNullOrBlank().not() -> PLYAPIEnvironment.Custom(apiUrl, null, paywallUrl)
-                else -> PLYAPIEnvironment.Staging
-            }
-        )
     }
 }
