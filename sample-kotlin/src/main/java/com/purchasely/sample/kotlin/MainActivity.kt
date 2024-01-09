@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
                 .stores(listOf(GoogleStore()))
                 .build()
                 .start { isConfigured, error ->
-                    if(isConfigured) Log.d("Purchasely", "You can display paywalls and make purchases")
+                    if(isConfigured) Log.d("Purchasely", "Configuration ok, You can display paywalls and make purchases")
                     if(error != null) Log.e("Purchasely", "Configuration error", error)
                 }
 
