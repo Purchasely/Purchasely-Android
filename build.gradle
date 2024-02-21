@@ -3,9 +3,9 @@
 buildscript {
     
     ext {
-        kotlin_version = '1.7.21'
-        compose_version = '1.4.0-alpha02'
-        purchasely_version = '4.2.4'
+        kotlin_version = '1.8.10'
+        compose_version = '1.4.3'
+        purchasely_version = '4.3.0'
     }
     repositories {
         google()
@@ -17,7 +17,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.huawei.agconnect:agcp:1.6.0.300'
-        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.42'
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.43.2'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
