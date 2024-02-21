@@ -1,3 +1,4 @@
 rootProject.name='Android Public'
 include ':sample-java'
-include ':sample-kotlin'
+//include ':sample-kotlin'
+include ':samplev2-kotlin'
