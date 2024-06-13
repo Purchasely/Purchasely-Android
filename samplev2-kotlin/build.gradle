@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace 'com.purchasely.samplev2'
+    namespace 'com.purchasely.demo'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.purchasely.samplev2"
+        applicationId "com.purchasely.demo"
         minSdk 24
         targetSdk 33
         versionCode 1

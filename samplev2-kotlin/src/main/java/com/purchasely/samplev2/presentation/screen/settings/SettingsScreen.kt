@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.purchasely.samplev2.R
+import com.purchasely.demo.R
 import com.purchasely.samplev2.presentation.common.CommonDropdownMenu
 import com.purchasely.samplev2.presentation.common.CommonSwitchOption
 import com.purchasely.samplev2.presentation.common.CommonTextField

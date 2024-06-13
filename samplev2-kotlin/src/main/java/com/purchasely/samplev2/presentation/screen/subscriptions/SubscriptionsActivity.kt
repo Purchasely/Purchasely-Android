@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.purchasely.samplev2.R
+import com.purchasely.demo.R
 import com.purchasely.samplev2.presentation.util.Constants.Companion.TAG
 import io.purchasely.ext.Purchasely
 
