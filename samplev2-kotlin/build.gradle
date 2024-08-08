@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.purchasely.demo"
-        minSdk 24
+        minSdk 21
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -22,10 +22,21 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file('../sample_keystore.keystore')
+            storePassword 'cmKeystore'
+            keyAlias 'cm_key_alias'
+            keyPassword 'cmKeystore'
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
