@@ -113,17 +113,17 @@ fun PlanInformation(plan: PLYPlan) {
         )
         Text(
             style = MaterialTheme.typography.bodyMedium,
-            text = "localized intro. price: ${plan.localizedIntroductoryPrice()}"
+            text = "localized intro. price: ${plan.localizedOfferPrice()}"
         )
         Text(
             style = MaterialTheme.typography.bodyMedium,
-            text = "localized full intro. price: ${plan.localizedFullIntroductoryPrice()}"
+            text = "localized full intro. price: ${plan.localizedFullOfferPrice()}"
         )
         Divider(Modifier.padding(vertical = 10.dp))
 
         Text(
             style = MaterialTheme.typography.bodyMedium,
-            text = "intro. period: ${plan.introductoryPeriod()?.unit?.name}"
+            text = "intro. period: ${plan.offerPeriod()?.unit?.name}"
         )
         Text(
             style = MaterialTheme.typography.bodyMedium,
@@ -131,7 +131,7 @@ fun PlanInformation(plan: PLYPlan) {
         )
         Text(
             style = MaterialTheme.typography.bodyMedium,
-            text = "localized intro. period: ${plan.localizedIntroductoryPeriod()}"
+            text = "localized intro. period: ${plan.localizedOfferPeriod()}"
         )
         Text(
             style = MaterialTheme.typography.bodyMedium,
@@ -149,11 +149,11 @@ fun PlanInformation(plan: PLYPlan) {
         )
         Text(
             style = MaterialTheme.typography.bodyMedium,
-            text = "intro. duration: ${plan.introductoryDuration()}"
+            text = "intro. duration: ${plan.offerDuration()}"
         )
         Text(
             style = MaterialTheme.typography.bodyMedium,
-            text = "localized intro. duration: ${plan.localizedIntroductoryDuration()}"
+            text = "localized intro. duration: ${plan.localizedOfferDuration()}"
         )
         Text(
             style = MaterialTheme.typography.bodyMedium,
@@ -163,7 +163,7 @@ fun PlanInformation(plan: PLYPlan) {
 
         Text(
             style = MaterialTheme.typography.bodyMedium,
-            text = "intro. cycles: ${plan.introductoryCycles()}"
+            text = "intro. cycles: ${plan.offerCycles()}"
         )
         Text(style = MaterialTheme.typography.bodyMedium, text = "amount: ${plan.amount()}")
         Text(style = MaterialTheme.typography.bodyMedium, text = "currency code: ${plan.currencyCode()}")
