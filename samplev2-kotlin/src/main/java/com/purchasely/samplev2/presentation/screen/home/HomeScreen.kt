@@ -54,6 +54,7 @@ import com.purchasely.samplev2.presentation.navigation.Screen
 import com.purchasely.samplev2.presentation.screen.subscriptions.SubscriptionsActivity
 import com.purchasely.samplev2.presentation.theme.Purple100
 import com.purchasely.samplev2.presentation.theme.Purple500
+import io.purchasely.ext.Purchasely
 
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
@@ -121,12 +122,18 @@ fun HomeScreenHeader(onSettingsClick: () -> Unit) {
             painter = painterResource(R.drawable.logo),
             contentDescription = "logo",
             modifier = Modifier
-                .size(50.dp)
+                .size(80.dp)
                 .padding(bottom = 8.dp)
         )
         Text(
             text = "Purchasely Demo",
             fontSize = 16.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color.White
+        )
+        Text(
+            text = "v${Purchasely.sdkVersion}",
+            fontSize = 14.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color.White
         )
