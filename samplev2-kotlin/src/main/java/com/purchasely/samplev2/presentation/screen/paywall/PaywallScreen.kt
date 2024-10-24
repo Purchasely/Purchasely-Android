@@ -18,7 +18,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.purchasely.samplev2.presentation.navigation.Screen
 import com.purchasely.samplev2.presentation.util.Constants.Companion.TAG
 import io.purchasely.ext.PLYPresentationAction
-import io.purchasely.ext.PLYPresentationViewProperties
+import io.purchasely.ext.PLYPresentationProperties
 import io.purchasely.ext.Purchasely
 
 
@@ -112,7 +112,7 @@ fun AsyncPresentationView(state: PaywallUiState, onCloseClick: () -> Unit) {
         factory = { context ->
             state.presentation?.buildView(
                 context = context,
-                viewProperties = PLYPresentationViewProperties(
+                properties = PLYPresentationProperties(
                     onClose = { onCloseClick() },
                 )
             ) ?: FrameLayout(context)

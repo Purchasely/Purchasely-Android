@@ -19,7 +19,7 @@ import io.purchasely.common.sha256
 import io.purchasely.ext.PLYCompletionHandler
 import io.purchasely.ext.PLYLogger
 import io.purchasely.ext.PLYPresentationActionParameters
-import io.purchasely.ext.PLYPresentationViewProperties
+import io.purchasely.ext.PLYPresentationProperties
 import io.purchasely.ext.Purchasely
 import io.purchasely.managers.PLYManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +47,7 @@ class PaywallViewModel @Inject constructor(
      * Set purchasely properties.
      */
     private fun getProperties() =
-        PLYPresentationViewProperties(
+        PLYPresentationProperties(
             placementId = preferencesRepository.getString(PLACEMENT_ID).takeUnless { it?.isBlank() == true },
             presentationId = preferencesRepository.getString(PRESENTATION_ID).takeUnless { it?.isBlank() == true },
             contentId = preferencesRepository.getString(CONTENT_ID).takeUnless { it?.isBlank() == true },
