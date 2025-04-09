@@ -25,7 +25,7 @@ public class FeatureListActivity extends AppCompatActivity {
 
         //TODO set the product id you want to display
 
-        View view = Purchasely.presentationViewForPlacement(
+        /*View view = Purchasely.presentationViewForPlacement(
                 this,
                 "onboarding",//Presentation Id, may be null for default
                 null,
@@ -44,9 +44,9 @@ public class FeatureListActivity extends AppCompatActivity {
                             .show();
                     return null;
                 }
-        );
+        );*/
 
-        ((FrameLayout) findViewById(R.id.container)).addView(view);
+        //((FrameLayout) findViewById(R.id.container)).addView(view);
 
         findViewById(R.id.progressBar).setVisibility(View.GONE);
 
