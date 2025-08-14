@@ -3,16 +3,17 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'dagger.hilt.android.plugin'
     id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.plugin.compose' version "2.1.21"
 }
 
 android {
     namespace 'com.purchasely.demo'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.purchasely.demo"
         minSdk 21
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -89,9 +90,9 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
     // Hilt Dependency Injection
-    implementation "androidx.hilt:hilt-navigation-compose:1.1.0-alpha01"
-    implementation "com.google.dagger:hilt-android:2.49"
-    kapt "com.google.dagger:hilt-android-compiler:2.49"
+    implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
+    implementation "com.google.dagger:hilt-android:2.57"
+    kapt "com.google.dagger:hilt-android-compiler:2.57"
 
     // Accompanist
     implementation "com.google.accompanist:accompanist-navigation-animation:0.34.0"
