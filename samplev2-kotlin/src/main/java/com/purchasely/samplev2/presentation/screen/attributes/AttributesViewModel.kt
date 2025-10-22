@@ -3,19 +3,16 @@ package com.purchasely.samplev2.presentation.screen.attributes
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.purchasely.samplev2.presentation.util.Constants
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.purchasely.ext.Purchasely
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import javax.inject.Inject
 
 /**
  * Home viewModel, providing [AttributesUiState] and methods for [AttributesScreen].
  */
-@HiltViewModel
-class AttributesViewModel @Inject constructor() : ViewModel() {
+class AttributesViewModel() : ViewModel() {
 
     val uiState = MutableStateFlow(AttributesUiState())
 

@@ -49,7 +49,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.purchasely.samplev2.presentation.common.CommonDropdownMenu
 import com.purchasely.samplev2.presentation.common.CommonScreenHeader
@@ -59,13 +58,14 @@ import com.purchasely.samplev2.presentation.theme.Gray200
 import com.purchasely.samplev2.presentation.theme.Gray500
 import com.purchasely.samplev2.presentation.theme.Gray700
 import com.purchasely.samplev2.presentation.theme.Red500
+import org.koin.compose.viewmodel.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun AttributesScreen(navController: NavController, viewModel: AttributesViewModel = hiltViewModel()) {
+fun AttributesScreen(navController: NavController, viewModel: AttributesViewModel = koinViewModel()) {
     val attributes = viewModel.uiState.collectAsState()
 
     Column(modifier = Modifier.background(color = Gray100)) {

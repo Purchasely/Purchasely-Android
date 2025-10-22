@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.purchasely.demo.R
@@ -38,9 +37,10 @@ import com.purchasely.samplev2.presentation.common.DropDownCommonTextField
 import com.purchasely.samplev2.presentation.common.drawTwoColors
 import com.purchasely.samplev2.presentation.navigation.Screen
 import com.purchasely.samplev2.presentation.theme.Gray100
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = koinViewModel()) {
     val systemUiController = rememberSystemUiController()
     systemUiController.isSystemBarsVisible = true
 
