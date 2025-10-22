@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose' version "$kotlin_version"
 }
 
 android {
@@ -49,6 +50,9 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
+    }
+    composeCompiler {
+        includeSourceInformation = true
     }
     packagingOptions {
         resources {
