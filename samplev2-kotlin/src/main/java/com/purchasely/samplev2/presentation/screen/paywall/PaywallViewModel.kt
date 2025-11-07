@@ -8,13 +8,12 @@ import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.QueryProductDetailsParams
+import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.CONTENT_ID
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.IS_ASYNC_LOADING
+import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.IS_OBSERVER_MODE
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.PLACEMENT_ID
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.PRESENTATION_ID
-import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.CONTENT_ID
-import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.IS_OBSERVER_MODE
 import com.purchasely.samplev2.domain.preferences.PreferencesRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.purchasely.common.sha256
 import io.purchasely.ext.PLYCompletionHandler
 import io.purchasely.ext.PLYLogger
@@ -23,10 +22,8 @@ import io.purchasely.ext.PLYPresentationProperties
 import io.purchasely.ext.Purchasely
 import io.purchasely.managers.PLYManager
 import kotlinx.coroutines.flow.MutableStateFlow
-import javax.inject.Inject
 
-@HiltViewModel
-class PaywallViewModel @Inject constructor(
+class PaywallViewModel(
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 

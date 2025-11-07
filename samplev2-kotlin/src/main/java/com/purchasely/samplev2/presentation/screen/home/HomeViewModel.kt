@@ -14,19 +14,16 @@ import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Compani
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.USER_ID
 import com.purchasely.samplev2.domain.preferences.PreferencesRepository
 import com.purchasely.samplev2.presentation.util.Constants.Companion.TAG
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.purchasely.ext.Attribute
 import io.purchasely.ext.Purchasely
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Home viewModel, providing [HomeUiState] and methods for [HomeScreen].
  */
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel(
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 

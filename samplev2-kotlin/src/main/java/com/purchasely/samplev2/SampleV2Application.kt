@@ -1,28 +1,38 @@
 package com.purchasely.samplev2
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
+import com.purchasely.samplev2.data.di.appModule
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.API_KEY
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.IS_OBSERVER_MODE
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.USER_ID
 import com.purchasely.samplev2.domain.preferences.PreferencesRepository
 import com.purchasely.samplev2.presentation.util.Constants.Companion.TAG
-import dagger.hilt.android.HiltAndroidApp
 import io.purchasely.ext.LogLevel
 import io.purchasely.ext.PLYRunningMode
 import io.purchasely.ext.Purchasely
 import io.purchasely.google.GoogleStore
-import javax.inject.Inject
+import org.koin.android.ext.android.get
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext.startKoin
 
-@HiltAndroidApp
 class SampleV2Application : Application() {
 
-    @Inject
     lateinit var preferencesRepository: PreferencesRepository
 
+    @SuppressLint("NewApi")
     override fun onCreate() {
         super.onCreate()
+
+        startKoin {
+            androidContext(this@SampleV2Application)
+            modules(appModule)
+        }
+
+        preferencesRepository = get()
+
 
         val stagingKey = "fcb39be4-2ba4-4db7-bde3-2a5a1e20745d"
         val apiKey = preferencesRepository.getString(API_KEY) ?: let {

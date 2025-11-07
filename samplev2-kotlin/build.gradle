@@ -1,8 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'dagger.hilt.android.plugin'
-    id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.plugin.compose' version "$kotlin_version"
 }
 
 android {
@@ -52,6 +51,9 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
     }
+    composeCompiler {
+        includeSourceInformation = true
+    }
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
@@ -81,17 +83,9 @@ dependencies {
     implementation 'androidx.compose.material3:material3:1.1.2'
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
-
-    // Hilt Dependency Injection
-    implementation "androidx.hilt:hilt-navigation-compose:1.1.0-alpha01"
-    implementation "com.google.dagger:hilt-android:2.49"
-    kapt "com.google.dagger:hilt-android-compiler:2.49"
+    // Koin Dependency Injection
+    implementation "io.insert-koin:koin-android:4.0.4"
+    implementation "io.insert-koin:koin-androidx-compose:4.0.4"
 
     // Accompanist
     implementation "com.google.accompanist:accompanist-navigation-animation:0.34.0"

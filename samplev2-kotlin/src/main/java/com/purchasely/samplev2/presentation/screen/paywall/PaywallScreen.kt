@@ -12,7 +12,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.purchasely.samplev2.presentation.navigation.Screen
@@ -20,10 +19,11 @@ import com.purchasely.samplev2.presentation.util.Constants.Companion.TAG
 import io.purchasely.ext.PLYPresentationAction
 import io.purchasely.ext.PLYPresentationProperties
 import io.purchasely.ext.Purchasely
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun PaywallScreen(navController: NavController, viewModel: PaywallViewModel = hiltViewModel()) {
+fun PaywallScreen(navController: NavController, viewModel: PaywallViewModel = koinViewModel()) {
     val uiState = viewModel.uiState.collectAsState()
 
     val context = LocalContext.current

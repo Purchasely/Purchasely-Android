@@ -2,18 +2,15 @@ package com.purchasely.samplev2.presentation.screen.products
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.purchasely.ext.Purchasely
 import io.purchasely.models.PLYPlan
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Home viewModel, providing [ProductsUiState] and methods for [ProductsScreen].
  */
-@HiltViewModel
-class ProductsViewModel @Inject constructor() : ViewModel() {
+class ProductsViewModel() : ViewModel() {
 
     /**
      * State flow of [ProductsUiState].

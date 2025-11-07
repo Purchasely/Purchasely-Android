@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SaveAlt
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ManageAccounts
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.purchasely.demo.R
@@ -55,9 +52,10 @@ import com.purchasely.samplev2.presentation.screen.subscriptions.SubscriptionsAc
 import com.purchasely.samplev2.presentation.theme.Purple100
 import com.purchasely.samplev2.presentation.theme.Purple500
 import io.purchasely.ext.Purchasely
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel = koinViewModel()) {
     val uiState = viewModel.uiState.collectAsState()
     val context = LocalContext.current
 

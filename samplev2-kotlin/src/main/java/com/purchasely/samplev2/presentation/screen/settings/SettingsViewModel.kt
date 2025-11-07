@@ -17,13 +17,10 @@ import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Compani
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.THEME
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.USER_ID
 import com.purchasely.samplev2.domain.preferences.PreferencesRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.purchasely.ext.Purchasely
 import io.purchasely.views.presentation.PLYThemeMode
-import javax.inject.Inject
 
-@HiltViewModel
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel(
     private val application: Application,
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {

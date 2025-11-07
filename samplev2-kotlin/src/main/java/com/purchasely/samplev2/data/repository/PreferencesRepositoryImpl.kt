@@ -3,11 +3,9 @@ package com.purchasely.samplev2.data.repository
 import android.content.Context
 import android.content.SharedPreferences
 import com.purchasely.samplev2.domain.preferences.PreferencesRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 
-class PreferencesRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+class PreferencesRepositoryImpl(
+    private val context: Context
 ) : PreferencesRepository {
 
     private val sharedPreferences: SharedPreferences by lazy {
