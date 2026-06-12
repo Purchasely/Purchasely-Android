@@ -36,13 +36,13 @@ class MainActivity : AppCompatActivity() {
                 .apiKey("fcb39be4-2ba4-4db7-bde3-2a5a1e20745d")
                 .userId(null) //you can set an user id if you have one
                 .logLevel(LogLevel.DEBUG) //set to ERROR in production
-                .readyToOpenDeeplink(true) //to open paywalls from deeplinks
-                .runningMode(PLYRunningMode.Full) //set to PLYRunningMode.PaywallObserver if you keep your transaction stack
+                .allowDeeplink(true) //to open paywalls from deeplinks
+                .runningMode(PLYRunningMode.Full) //set to PLYRunningMode.Observer if you keep your transaction stack
                 .stores(listOf(GoogleStore()))
                 .build()
-                .start { isConfigured, error ->
-                    if(isConfigured) Log.d("Purchasely", "Configuration ok, You can display paywalls and make purchases")
-                    if(error != null) Log.e("Purchasely", "Configuration error", error)
+                .start { error ->
+                    if(error == null) Log.d("Purchasely", "Configuration ok, You can display paywalls and make purchases")
+                    else Log.e("Purchasely", "Configuration error", error)
                 }
 
         Purchasely.eventListener = eventListener
@@ -77,8 +77,8 @@ class MainActivity : AppCompatActivity() {
 
         /*
             If you need the purchase result when a paywall is open directly via a deeplink :
-            Purchasely.setDefaultPresentationResultHandler  { result, plan ->
-                Log.d("PurchaselyDemo", "Purchased result is $result with plan ${plan?.vendorId}")
+            Purchasely.setDefaultPresentationResultHandler  { outcome ->
+                Log.d("PurchaselyDemo", "Purchased result is ${outcome.purchaseResult} with plan ${outcome.plan?.vendorId}")
             }
          */
 
@@ -151,32 +151,32 @@ class Holder(override val containerView: TextView) : RecyclerView.ViewHolder(con
             append("\n")
             append(
                 String.format(
-                    "Full introductory price: %s",
-                    plan.localizedFullIntroductoryPrice()
+                    "Full offer price: %s",
+                    plan.localizedFullOfferPrice()
                 )
             )
             append("\n")
-            append(String.format("Introductory Price: %s", plan.localizedIntroductoryPrice()))
+            append(String.format("Offer Price: %s", plan.localizedOfferPrice()))
             append("\n")
             append(
                 String.format(
-                    "Introductory Localized Period: %s",
-                    plan.localizedIntroductoryPeriod()
+                    "Offer Localized Period: %s",
+                    plan.localizedOfferPeriod()
                 )
             )
             append("\n")
             append(
                 String.format(
-                    "Introductory Localized Duration: %s",
-                    plan.localizedIntroductoryDuration()
+                    "Offer Localized Duration: %s",
+                    plan.localizedOfferDuration()
                 )
             )
             append("\n")
-            append(String.format("Introductory Period: %s", plan.introductoryPeriod()?.unit))
+            append(String.format("Offer Period: %s", plan.offerPeriod()?.unit))
             append("\n")
-            append(String.format("Introductory Duration: %s", plan.introductoryDuration()))
+            append(String.format("Offer Duration: %s", plan.offerDuration()))
             append("\n")
-            append(String.format("Introductory Cycles: %s", plan.introductoryCycles()))
+            append(String.format("Offer Cycles: %s", plan.offerCycles()))
             append("\n")
             append(String.format("Trial Period: %s", plan.freeTrialPeriod()?.unit))
             append("\n")

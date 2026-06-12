@@ -45,25 +45,26 @@ class SampleV2Application : Application() {
     }
 
     /**
-     * Start purchasely instance.
+     * Start purchasely instance using the v6 Kotlin DSL.
+     * Invoking `Purchasely { ... }` configures **and** starts the SDK in one call.
      */
     fun startPurchasely(apiKey: String, userId: String?) {
-        Purchasely.Builder(applicationContext)
-            .apiKey(apiKey)
-            .userId(userId)
-            .logLevel(LogLevel.DEBUG)
-            .readyToOpenDeeplink(true)
-            .runningMode(if(preferencesRepository.getBoolean(IS_OBSERVER_MODE)) PLYRunningMode.PaywallObserver else PLYRunningMode.Full)
-            .stores(listOf(GoogleStore()))
-            .build()
-            .start { isConfigured, error ->
-                if (isConfigured) {
+        Purchasely {
+            context(applicationContext)
+            apiKey(apiKey)
+            userId(userId)
+            logLevel(LogLevel.DEBUG)
+            allowDeeplink(true)
+            runningMode(if(preferencesRepository.getBoolean(IS_OBSERVER_MODE)) PLYRunningMode.Observer else PLYRunningMode.Full)
+            stores(listOf(GoogleStore()))
+            onInitialized { error ->
+                if (error == null) {
                     Log.d(TAG, "Purchasely configured successfully")
-                }
-                if (error != null) {
+                } else {
                     Log.e(TAG, "Purchasely configuration error: $error")
                     Toast.makeText(applicationContext, "Failed to start Purchasely SDK.", Toast.LENGTH_LONG).show()
                 }
             }
+        }
     }
 }

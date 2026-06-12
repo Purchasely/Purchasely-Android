@@ -39,9 +39,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleDeepLink(intent: Intent?) {
+        // v6: the SDK intercepts Purchasely deeplinks automatically from the foreground
+        // activity's intent. This manual call still works (and is deduped) for launch modes
+        // where auto-interception cannot see the URI.
         if (intent?.action == Intent.ACTION_VIEW) {
             intent.data?.let {
-                Purchasely.isDeeplinkHandled(it)
+                Purchasely.handleDeeplink(it)
             }
         }
     }

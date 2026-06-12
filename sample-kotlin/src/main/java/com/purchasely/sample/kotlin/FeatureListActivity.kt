@@ -9,8 +9,13 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.*
+import io.purchasely.ext.presentation.*
 import com.purchasely.sample.R
 import kotlinx.android.synthetic.main.activity_feature_list.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
 
 class FeatureListActivity : FragmentActivity() {
 
@@ -30,38 +35,44 @@ class FeatureListActivity : FragmentActivity() {
         //you can setup the paywall in an invisible container to load it until ready
         findViewById<FrameLayout>(R.id.paywall).visibility = View.INVISIBLE
 
-        val paywallView = Purchasely.presentationView(
-            this,
-            PLYPresentationViewProperties(
-                placementId = "abtest",
-                contentId = "my_content_id which is optional",
-                displayCloseButton = true, //true by default, you can set to false if you never want it displayed
-                onLoaded = { isLoaded ->
-                    //paywall is ready to be shown
-                    if(isLoaded) {
-                        progressBar.isVisible = false
-                        findViewById<FrameLayout>(R.id.paywall).visibility = View.VISIBLE
-                    }
-                },
-                onClose = {
-                    //TODO this is mandatory to handle with a View to remove it when user click on close button
-                    findViewById<FrameLayout>(R.id.paywall).removeAllViews()
+        //v6: build a presentation with the PLYPresentation { } DSL, preload it, then build its view
+        PLYPresentation {
+            placementId("abtest")
+            contentId("my_content_id which is optional")
+            displayCloseButton(true) //true by default, you can set to false if you never want it displayed
+            onCloseRequested {
+                //TODO this is mandatory to handle with a View to remove it when user click on close button
+                findViewById<FrameLayout>(R.id.paywall).removeAllViews()
 
-                    //this activity has nothing to display so close it
+                //this activity has nothing to display so close it
+                supportFinishAfterTransition()
+            }
+        }.preload { loaded, error ->
+            runOnUiThread {
+                if (error != null || loaded == null) {
+                    Log.e("Purchasely", "Unable to load paywall", error)
                     supportFinishAfterTransition()
+                    return@runOnUiThread
                 }
-            )
-        ) { result, plan ->
-            //called when paywall is closed
-            //Purchased and Restored are returned only if purchase was validated by Purchasely, Google and your backend (if webhook configured)
-            when(result) {
-                PLYProductViewResult.PURCHASED -> Log.d("Purchasely", "User purchased $plan, you can call your backend to refresh user information and grant his entitlements")
-                PLYProductViewResult.RESTORED -> Log.d("Purchasely", "User restored $plan, you can call your backend to refresh user information and grant his entitlements")
-                PLYProductViewResult.CANCELLED -> Log.d("Purchasely", "User closed paywall without purchasing")
+
+                val paywallView = loaded.buildView(this) { outcome ->
+                    //called when paywall is closed
+                    //Purchased and Restored are returned only if purchase was validated by Purchasely, Google and your backend (if webhook configured)
+                    when (outcome.purchaseResult) {
+                        PLYPurchaseResult.PURCHASED -> Log.d("Purchasely", "User purchased ${outcome.plan}, you can call your backend to refresh user information and grant his entitlements")
+                        PLYPurchaseResult.RESTORED -> Log.d("Purchasely", "User restored ${outcome.plan}, you can call your backend to refresh user information and grant his entitlements")
+                        PLYPurchaseResult.CANCELLED -> Log.d("Purchasely", "User closed paywall without purchasing")
+                        null -> Log.d("Purchasely", "Paywall dismissed without a purchase action")
+                    }
+                } ?: return@runOnUiThread
+
+                progressBar.isVisible = false
+                findViewById<FrameLayout>(R.id.paywall).apply {
+                    addView(paywallView)
+                    visibility = View.VISIBLE
+                }
             }
         }
-
-        findViewById<FrameLayout>(R.id.paywall).addView(paywallView)
 
         //Implement UI Listener to handle UI event that may appear to user (success and error dialog)
         /*Purchasely.uiListener = object: UIListener {
@@ -86,66 +97,41 @@ class FeatureListActivity : FragmentActivity() {
         }
 
         /**
-         * Before displaying purchase view, you can display you own content
-         * and send back a boolean to result callback
-         * true if you allow the user to continue with his purchase
-         * false otherwise
+         * Before displaying purchase view, you can display your own content
+         * and return a [PLYInterceptResult]:
+         *   NOT_HANDLED -> let the SDK perform the action (old processAction(true))
+         *   SUCCESS     -> you handled it, the SDK skips its default behavior (old processAction(false))
+         *   FAILED      -> you tried but failed, breaking the action chain
+         *
+         * v6 replaces the monolithic setPaywallActionsInterceptor with granular,
+         * type-safe per-action interceptors. The lambda is a suspend function, so you can
+         * await your own UI (e.g. a confirmation dialog) before returning a result.
          */
-        Purchasely.setPaywallActionsInterceptor { info, action, parameters, processAction ->
+        Purchasely.interceptAction<PLYPresentationAction.Purchase> { info, _ ->
+            if (info.activity != this@FeatureListActivity) return@interceptAction PLYInterceptResult.NOT_HANDLED
 
-            if(info?.activity != this@FeatureListActivity) {
-                return@setPaywallActionsInterceptor
-            }
+            //display an alert dialog and wait for the user's choice
+            if (confirmDialog("Do you agree with our terms and conditions ?", "I agree", "Cancel"))
+                PLYInterceptResult.NOT_HANDLED // let the SDK continue with the purchase
+            else
+                PLYInterceptResult.SUCCESS     // you handled it -> the SDK skips the purchase
+        }
 
-            when(action) {
-                PLYPresentationAction.PURCHASE -> {
-                    //display an alert dialog
-                    AlertDialog.Builder(this@FeatureListActivity)
-                        .setTitle("Do you agree with our terms and conditions ?")
-                        .setPositiveButton("I agree") { dialog, _ ->
-                            processAction(true)
-                            dialog.dismiss()
-                        }
-                        .setNegativeButton("Cancel") { dialog, _ ->
-                            processAction(false)
-                            dialog.dismiss()
-                        }
-                        .create()
-                        .show()
+        Purchasely.interceptAction<PLYPresentationAction.Close> { info, _ ->
+            if (info.activity != this@FeatureListActivity) return@interceptAction PLYInterceptResult.NOT_HANDLED
 
-                    //or display a fragment
-                    /*
-                    supportFragmentManager.beginTransaction()
-                            .addToBackStack(null)
-                            .add(R.id.inappFragment, LegalFragment(result), "InAppFragment")
-                            .commitAllowingStateLoss()
-                     */
-                }
-                PLYPresentationAction.CLOSE -> {
-                    AlertDialog.Builder(this@FeatureListActivity)
-                        .setTitle("Close paywall ?")
-                        .setPositiveButton("Close") { dialog, _ ->
-                            processAction(true)
-                            dialog.dismiss()
-                        }
-                        .setNegativeButton("Cancel") { dialog, _ ->
-                            processAction(false)
-                            dialog.dismiss()
-                        }
-                        .create()
-                        .show()
-                }
-                PLYPresentationAction.LOGIN -> {
-                    /*
-                        Display your own view to log in the user
-                        DO NOT FORGET to call Purchasely.userLogin(userId) after successful login
-                     */
+            if (confirmDialog("Close paywall ?", "Close", "Cancel"))
+                PLYInterceptResult.NOT_HANDLED // let the SDK close the paywall
+            else
+                PLYInterceptResult.SUCCESS     // keep the paywall open
+        }
 
-                    //Once done call with true if user logged in or false if he did not
-                    processAction(true)
-                }
-                else -> processAction(true)
-            }
+        Purchasely.interceptAction<PLYPresentationAction.Login> { _, _ ->
+            /*
+                Display your own view to log in the user
+                DO NOT FORGET to call Purchasely.userLogin(userId) after successful login
+             */
+            PLYInterceptResult.NOT_HANDLED
         }
 
         /*supportFragmentManager.addOnBackStackChangedListener {
@@ -154,6 +140,24 @@ class FeatureListActivity : FragmentActivity() {
             }
         }*/
     }
+
+    /**
+     * Shows a confirmation dialog and suspends until the user makes a choice.
+     * Returns true if the positive button was tapped, false otherwise.
+     */
+    private suspend fun confirmDialog(title: String, positive: String, negative: String): Boolean =
+        withContext(Dispatchers.Main) {
+            suspendCancellableCoroutine { continuation ->
+                val dialog = AlertDialog.Builder(this@FeatureListActivity)
+                    .setTitle(title)
+                    .setPositiveButton(positive) { d, _ -> d.dismiss(); if (continuation.isActive) continuation.resume(true) }
+                    .setNegativeButton(negative) { d, _ -> d.dismiss(); if (continuation.isActive) continuation.resume(false) }
+                    .setOnCancelListener { if (continuation.isActive) continuation.resume(false) }
+                    .create()
+                continuation.invokeOnCancellation { dialog.dismiss() }
+                dialog.show()
+            }
+        }
 
     /**
      * You can display your own view like a dialog to inform the user

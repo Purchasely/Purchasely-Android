@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import io.purchasely.ext.*
+import io.purchasely.ext.presentation.*
 import io.purchasely.models.PLYPlan
 import com.purchasely.sample.R
 import kotlinx.android.extensions.LayoutContainer
@@ -53,28 +54,27 @@ class ClientActivity : AppCompatActivity() {
 
         /* You can also use coroutines
         lifecycleScope.launch {
-            val presentation = Purchasely.fetchPresentation(
-                this@ClientActivity,
-                PLYPresentationViewProperties(placementId = "client_placement")) { result, plan ->
-
-            }
+            val presentation = PLYPresentation { placementId("client") }.preload()
         }*/
 
-        Purchasely.fetchPresentationForPlacement( "client") { presentation, error ->
-            this.presentation = presentation
-            if(presentation?.type == PLYPresentationType.CLIENT) {
-                Purchasely.clientPresentationDisplayed(presentation)
+        //v6: build the presentation with the DSL and preload() it
+        PLYPresentation { placementId("client") }.preload { presentation, error ->
+            runOnUiThread {
+                this.presentation = presentation
+                if (presentation?.type == PLYPresentationType.CLIENT) {
+                    Purchasely.clientPresentationDisplayed(presentation)
 
-                lifecycleScope.launch {
-                    adapter.list.addAll(presentation.plans.mapNotNull { Purchasely.plan(it.planVendorId!!) })
-                    adapter.notifyDataSetChanged()
-                }
-            } else {
-                if(presentation?.type == PLYPresentationType.DEACTIVATED) {
-                    Snackbar.make(findViewById<RecyclerView>(R.id.recyclerView2), "Paywall is deactivated", Snackbar.LENGTH_SHORT).show()
+                    lifecycleScope.launch {
+                        adapter.list.addAll(presentation.plans.mapNotNull { Purchasely.plan(it.planVendorId!!) })
+                        adapter.notifyDataSetChanged()
+                    }
                 } else {
-                    startActivity(Intent(applicationContext, PresentationAsyncActivity::class.java))
-                    supportFinishAfterTransition()
+                    if (presentation?.type == PLYPresentationType.DEACTIVATED) {
+                        Snackbar.make(findViewById<RecyclerView>(R.id.recyclerView2), "Paywall is deactivated", Snackbar.LENGTH_SHORT).show()
+                    } else {
+                        startActivity(Intent(applicationContext, PresentationAsyncActivity::class.java))
+                        supportFinishAfterTransition()
+                    }
                 }
             }
         }
@@ -117,7 +117,7 @@ class ClientActivity : AppCompatActivity() {
                 "PERIOD: ${plan.period()?.toLocale()} \n" +
                 "TYPE: ${plan.type} \n" +
                 "PRICE: ${plan.localizedFullPrice()} \n" +
-                "INTRO_PRICE: ${plan.localizedFullIntroductoryPrice()} \n" +
+                "OFFER_PRICE: ${plan.localizedFullOfferPrice()} \n" +
                 "FREE_TRIAL: ${plan.hasFreeTrial()} \n"
         }
 

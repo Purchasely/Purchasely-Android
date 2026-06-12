@@ -11,14 +11,18 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import io.purchasely.ext.Purchasely
+import io.purchasely.ext.presentation.PLYPresentation
+import io.purchasely.ext.presentation.preload
 import com.purchasely.sample.kotlin.ui.theme.AndroidPublicTheme
 
 class ComposeActivity : ComponentActivity() {
@@ -59,30 +63,32 @@ fun Greeting(name: String, close: (() -> Unit)? = null) {
 
 @Composable
 fun paywall(displayPaywall: MutableState<Boolean>) {
-    AndroidView(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(0.dp, 5.dp), // Occupy the max size in the Compose UI tree
-        factory = { context ->
-            // Creates custom view
-            val paywall = Purchasely.presentationViewForPlacement(
-                context,
-                "ACCOUNT",
-                onClose = {
-                    displayPaywall.value = false
-                })
+    // v6: preload the presentation, then embed the view returned by buildView() in an AndroidView
+    var loaded by remember { mutableStateOf<PLYPresentation?>(null) }
 
-            paywall ?: FrameLayout(context)
-        },
-        update = { view ->
-            // View's been inflated or state read in this block has been updated
-            // Add logic here if necessary
-
-            // As selectedItem is read here, AndroidView will recompose
-            // whenever the state changes
-            // Example of Compose -> View communication
+    LaunchedEffect(Unit) {
+        loaded = try {
+            PLYPresentation {
+                placementId("ACCOUNT")
+                onCloseRequested { displayPaywall.value = false }
+            }.preload()
+        } catch (e: Exception) {
+            displayPaywall.value = false
+            null
         }
-    )
+    }
+
+    loaded?.let { presentation ->
+        AndroidView(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(0.dp, 5.dp), // Occupy the max size in the Compose UI tree
+            factory = { context ->
+                // Creates the custom paywall view from the preloaded presentation
+                presentation.buildView(context) ?: FrameLayout(context)
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true)

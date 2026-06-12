@@ -3,11 +3,16 @@ package com.purchasely.samplev2.presentation.screen.paywall
 import android.app.Activity
 import android.util.Log
 import android.widget.FrameLayout
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
@@ -16,15 +21,19 @@ import androidx.navigation.NavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.purchasely.samplev2.presentation.navigation.Screen
 import com.purchasely.samplev2.presentation.util.Constants.Companion.TAG
-import io.purchasely.ext.PLYPresentationAction
-import io.purchasely.ext.PLYPresentationProperties
+import io.purchasely.ext.PLYInterceptResult
 import io.purchasely.ext.Purchasely
+import io.purchasely.ext.interceptAction
+import io.purchasely.ext.presentation.PLYPresentation
+import io.purchasely.ext.presentation.PLYPresentationAction
+import io.purchasely.ext.presentation.preload
+import io.purchasely.ext.removeActionInterceptor
 import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
 fun PaywallScreen(navController: NavController, viewModel: PaywallViewModel = koinViewModel()) {
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     val context = LocalContext.current
     val systemUiController = rememberSystemUiController()
@@ -35,87 +44,61 @@ fun PaywallScreen(navController: NavController, viewModel: PaywallViewModel = ko
         systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
-    Purchasely.setPaywallActionsInterceptor { info, action, parameters, processAction ->
-        if (info?.activity == null) {
-            processAction(true)
-            return@setPaywallActionsInterceptor
+    // v6: register granular, type-safe per-action interceptors (replaces setPaywallActionsInterceptor)
+    DisposableEffect(Unit) {
+        Purchasely.interceptAction<PLYPresentationAction.Login> { _, _ ->
+            navController.navigateUp()
+            navController.navigate(Screen.Settings.route)
+            PLYInterceptResult.SUCCESS
         }
-        when (action) {
-            PLYPresentationAction.LOGIN -> {
-                navController.navigateUp()
-                navController.navigate(Screen.Settings.route)
-            }
-            PLYPresentationAction.PURCHASE -> {
-                if(viewModel.observerMode()) {
+        Purchasely.interceptAction<PLYPresentationAction.Purchase> { info, purchase ->
+            if (viewModel.observerMode()) {
+                info.activity?.let { purchasingActivity ->
                     viewModel.purchase(
-                        activity = activity,
-                        parameters = parameters,
-                        processAction = processAction,
-                        onPurchaseSuccess = {
-                            navController.navigateUp()
-                        },
+                        activity = purchasingActivity,
+                        purchase = purchase,
+                        onPurchaseSuccess = { navController.navigateUp() },
                     )
                 }
-                else {
-                    processAction(true)
-                }
+                PLYInterceptResult.SUCCESS // the app handles the purchase itself in observer mode
+            } else {
+                PLYInterceptResult.NOT_HANDLED // let the SDK handle the purchase
             }
-            else -> {
-                processAction(true)
-            }
+        }
+        onDispose {
+            Purchasely.removeActionInterceptor<PLYPresentationAction.Login>()
+            Purchasely.removeActionInterceptor<PLYPresentationAction.Purchase>()
         }
     }
 
-    if (uiState.value.asyncLoading) {
-        val isFinished = remember { mutableStateOf(false) }
-        LaunchedEffect(Unit) {
-            Purchasely.fetchPresentation(properties = uiState.value.properties) { presentation, error ->
-                error?.let {
-                    Log.e(TAG, "Error fetching paywall", error)
-                    return@fetchPresentation
-                }
-                uiState.value.presentation = presentation
-                isFinished.value = true
-            }
+    // v6: build the presentation with the DSL, preload it, then embed buildView() in an AndroidView.
+    // This single path covers both the direct and "async" loading modes — there is no longer a
+    // separate synchronous presentationView() API.
+    val loaded by produceState<PLYPresentation?>(
+        initialValue = null,
+        uiState.placementId, uiState.presentationId, uiState.contentId
+    ) {
+        value = try {
+            PLYPresentation {
+                uiState.placementId?.let { placementId(it) }
+                uiState.presentationId?.let { screenId(it) }
+                uiState.contentId?.let { contentId(it) }
+                onCloseRequested { navController.navigateUp() }
+            }.preload()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching paywall", e)
+            null
         }
+    }
 
-        if (isFinished.value) {
-            AsyncPresentationView(
-                state = uiState.value,
-                onCloseClick = { navController.navigateUp() }
-            )
-        }
-    } else {
-        PresentationView(
-            state = uiState.value,
-            onCloseClick = { navController.navigateUp() }
+    val presentation = loaded
+    if (presentation != null) {
+        AndroidView(
+            factory = { ctx -> presentation.buildView(ctx) ?: FrameLayout(ctx) }
         )
+    } else if (uiState.asyncLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
     }
-}
-
-@Composable
-fun PresentationView(state: PaywallUiState, onCloseClick: () -> Unit) {
-    AndroidView(
-        factory = { context ->
-            Purchasely.presentationView(
-                context = context,
-                properties = state.properties.copy(onClose = onCloseClick),
-            ) ?: FrameLayout(context)
-        }
-    )
-}
-
-
-@Composable
-fun AsyncPresentationView(state: PaywallUiState, onCloseClick: () -> Unit) {
-    AndroidView(
-        factory = { context ->
-            state.presentation?.buildView(
-                context = context,
-                properties = PLYPresentationProperties(
-                    onClose = { onCloseClick() },
-                )
-            ) ?: FrameLayout(context)
-        }
-    )
 }

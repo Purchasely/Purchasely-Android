@@ -7,6 +7,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.CONTENT_ID
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.IS_ASYNC_LOADING
@@ -15,11 +16,9 @@ import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Compani
 import com.purchasely.samplev2.data.repository.PreferencesRepositoryImpl.Companion.PRESENTATION_ID
 import com.purchasely.samplev2.domain.preferences.PreferencesRepository
 import io.purchasely.common.sha256
-import io.purchasely.ext.PLYCompletionHandler
 import io.purchasely.ext.PLYLogger
-import io.purchasely.ext.PLYPresentationActionParameters
-import io.purchasely.ext.PLYPresentationProperties
 import io.purchasely.ext.Purchasely
+import io.purchasely.ext.presentation.PLYPresentationAction
 import io.purchasely.managers.PLYManager
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -34,36 +33,31 @@ class PaywallViewModel(
             uiState.value = uiState.value.copy(
                 placementId = getString(PLACEMENT_ID).takeUnless { it?.isBlank() == true },
                 presentationId = getString(PRESENTATION_ID).takeUnless { it?.isBlank() == true },
+                contentId = getString(CONTENT_ID).takeUnless { it?.isBlank() == true },
                 asyncLoading = getBoolean(IS_ASYNC_LOADING),
-                properties = getProperties()
             )
         }
     }
 
-    /**
-     * Set purchasely properties.
-     */
-    private fun getProperties() =
-        PLYPresentationProperties(
-            placementId = preferencesRepository.getString(PLACEMENT_ID).takeUnless { it?.isBlank() == true },
-            presentationId = preferencesRepository.getString(PRESENTATION_ID).takeUnless { it?.isBlank() == true },
-            contentId = preferencesRepository.getString(CONTENT_ID).takeUnless { it?.isBlank() == true },
-            onLoaded = {}
-        )
-
     fun observerMode() = preferencesRepository.getBoolean(IS_OBSERVER_MODE)
 
+    /**
+     * Handles a [PLYPresentationAction.Purchase] intercepted in observer mode by running the
+     * purchase through the host app's own Google Play Billing flow. Fire-and-forget: the
+     * interceptor returns [io.purchasely.ext.PLYInterceptResult.SUCCESS] right after calling this
+     * (the app is handling the purchase), and [onPurchaseSuccess] is invoked once Billing confirms.
+     */
     fun purchase(
         activity: Activity,
-        parameters: PLYPresentationActionParameters,
-        processAction: PLYCompletionHandler,
+        purchase: PLYPresentationAction.Purchase,
         onPurchaseSuccess: () -> Unit
     ) {
-        PLYLogger.d("Purchase action intercepted: $parameters")
+        PLYLogger.d("Purchase action intercepted: $purchase")
         val billingClient = BillingClient.newBuilder(activity.applicationContext)
             .setListener { billingResult, _ ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    PLYLogger.d("Purchased ${parameters.plan?.vendorId} successfully")
+                    PLYLogger.d("Purchased ${purchase.plan.vendorId} successfully")
+                    // In observer mode, notify Purchasely so it can validate the receipt.
                     Purchasely.synchronize()
                     // acknowledge purchase
                     onPurchaseSuccess()
@@ -75,9 +69,12 @@ class PaywallViewModel(
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-                processAction(false)
             }
-            .enablePendingPurchases()
+            .enablePendingPurchases(
+                PendingPurchasesParams.newBuilder()
+                    .enableOneTimeProducts()
+                    .build()
+            )
             .build()
 
         billingClient.startConnection(object : BillingClientStateListener {
@@ -85,18 +82,16 @@ class PaywallViewModel(
                 PLYLogger.e("Unable to connect to billing service")
                 Toast.makeText(activity.applicationContext, "Unable to connect to billing service", Toast.LENGTH_SHORT)
                     .show()
-                processAction(false)
             }
 
             override fun onBillingSetupFinished(p0: BillingResult) {
-                val sku = parameters.subscriptionOffer?.subscriptionId ?: let {
-                    PLYLogger.e("Unable to find subscription ${parameters.subscriptionOffer}")
+                val sku = purchase.subscriptionOffer?.subscriptionId ?: let {
+                    PLYLogger.e("Unable to find subscription ${purchase.subscriptionOffer}")
                     Toast.makeText(
                         activity.applicationContext,
-                        "Unable to find subscription ${parameters.subscriptionOffer}",
+                        "Unable to find subscription ${purchase.subscriptionOffer}",
                         Toast.LENGTH_SHORT
                     ).show()
-                    processAction(false)
                     return
                 }
 
@@ -108,15 +103,15 @@ class PaywallViewModel(
                             .build())
                 ).build()
 
-                billingClient.queryProductDetailsAsync(params) { result, list ->
+                billingClient.queryProductDetailsAsync(params) { result, queryResult ->
                     if(result.responseCode == BillingClient.BillingResponseCode.OK) {
-                        list.forEach { productDetails ->
+                        queryResult.productDetailsList.orEmpty().forEach { productDetails ->
                             val productDetailsParamsList =
                                 listOf(
                                     BillingFlowParams.ProductDetailsParams.newBuilder()
                                         .setProductDetails(productDetails).apply {
                                             //should be null for OTP only
-                                            parameters.subscriptionOffer?.offerToken?.let {
+                                            purchase.subscriptionOffer?.offerToken?.let {
                                                 setOfferToken(it)
                                             }
                                         }
@@ -137,7 +132,6 @@ class PaywallViewModel(
                     } else {
                         PLYLogger.e("Error: ${result.responseCode}")
                         Toast.makeText(activity.applicationContext, "Error: ${result.responseCode}", Toast.LENGTH_SHORT).show()
-                        processAction(false)
                     }
                 }
             }

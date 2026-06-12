@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 //TODO set your api key
                 .apiKey("afa96c76-1d8e-4e3c-a48f-204a3cd93a15")
                 .logLevel(LogLevel.DEBUG)
-                .readyToOpenDeeplink(true)
+                .allowDeeplink(true)
                 .runningMode(PLYRunningMode.Full.INSTANCE)
                 .stores(stores)
                 .build();
@@ -126,13 +126,13 @@ public class MainActivity extends AppCompatActivity {
             content.append("\n");
             content.append(String.format("Period: %s", plan.localizedPeriod()));
             content.append("\n");
-            content.append(String.format("Full introductory price: %s", plan.localizedFullIntroductoryPrice(null)));
+            content.append(String.format("Full offer price: %s", plan.localizedFullOfferPrice(null)));
             content.append("\n");
-            content.append(String.format("Introductory Price: %s", plan.localizedIntroductoryPrice(false, null)));
+            content.append(String.format("Offer Price: %s", plan.localizedOfferPrice(false, null)));
             content.append("\n");
-            content.append(String.format("Introductory Period: %s", plan.localizedIntroductoryPeriod(null)));
+            content.append(String.format("Offer Period: %s", plan.localizedOfferPeriod(null)));
             content.append("\n");
-            content.append(String.format("Introductory Duration: %s", plan.localizedIntroductoryDuration(null)));
+            content.append(String.format("Offer Duration: %s", plan.localizedOfferDuration(null)));
             content.append("\n");
             content.append(String.format("Trial Period: %s", plan.localizedTrialDuration(null)));
             content.append("\n");
