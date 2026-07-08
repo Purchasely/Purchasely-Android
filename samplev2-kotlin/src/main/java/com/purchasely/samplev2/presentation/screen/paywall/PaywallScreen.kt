@@ -23,11 +23,9 @@ import com.purchasely.samplev2.presentation.navigation.Screen
 import com.purchasely.samplev2.presentation.util.Constants.Companion.TAG
 import io.purchasely.ext.PLYInterceptResult
 import io.purchasely.ext.Purchasely
-import io.purchasely.ext.interceptAction
 import io.purchasely.ext.presentation.PLYPresentation
 import io.purchasely.ext.presentation.PLYPresentationAction
 import io.purchasely.ext.presentation.preload
-import io.purchasely.ext.removeActionInterceptor
 import org.koin.androidx.compose.koinViewModel
 
 
