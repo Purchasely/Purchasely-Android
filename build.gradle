@@ -5,7 +5,7 @@ buildscript {
     ext {
         kotlin_version = '2.2.21'
         compose_version = '1.5.4'
-        purchasely_version = '6.0.0-rc.3'
+        purchasely_version = '6.0.1'
     }
     repositories {
         google()
