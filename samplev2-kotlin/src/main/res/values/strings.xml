@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Purchasely Demo</string>
+    <string name="app_name" translatable="false">Purchasely</string>
+    <string name="lang" translatable="true">(ENG)</string>
 </resources>

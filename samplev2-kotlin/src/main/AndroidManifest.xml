@@ -6,23 +6,49 @@
         android:allowBackup="true"
         android:icon="@mipmap/logo_launcher"
         android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/logo_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Purchasely">
         <activity
             android:name="com.purchasely.samplev2.presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Purchasely">
+            android:theme="@style/Theme.Purchasely.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name="com.purchasely.samplev2.presentation.screen.subscriptions.SubscriptionsActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Purchasely">
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+
+                <data android:host="purchasely.io"/>
+                <data android:pathPrefix="/ply"/>
+
+                <data android:host="www.purchasely.io"/>
+                <data android:pathPrefix="/ply"/>
+
+                <data android:host="purchasely.com"/>
+                <data android:pathPrefix="/ply"/>
+
+                <data android:host="www.purchasely.com"/>
+                <data android:pathPrefix="/ply"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="purchasely" />
+                <data android:host="ply"/>
+            </intent-filter>
+
         </activity>
     </application>
 

@@ -69,19 +69,19 @@ dependencies {
     implementation "io.purchasely:player:$purchasely_version"
 
     // Androidx core
-    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.core:core-ktx:1.17.0'
 
     // Lifecycle
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.4'
 
     // Compose + Material3
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.activity:activity-compose:1.11.0'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-graphics:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation 'androidx.compose.material3:material3:1.1.2'
-    implementation "androidx.compose.material:material-icons-extended:$compose_version"
+    implementation 'androidx.compose.material3:material3:1.4.0'
+    implementation "androidx.compose.material:material-icons-extended:1.7.8"
 
     // Koin Dependency Injection
     implementation "io.insert-koin:koin-android:4.0.4"

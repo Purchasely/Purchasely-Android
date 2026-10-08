@@ -1,13 +1,17 @@
 package com.purchasely.samplev2.presentation.screen.attributes
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.purchasely.samplev2.presentation.util.Constants
+import androidx.lifecycle.viewModelScope
+import io.purchasely.ext.PLYDataProcessingLegalBasis
+import io.purchasely.ext.PLYLogger
 import io.purchasely.ext.Purchasely
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Home viewModel, providing [AttributesUiState] and methods for [AttributesScreen].
@@ -23,32 +27,67 @@ class AttributesViewModel() : ViewModel() {
     /**
      * Add a new user attribute.
      */
-    fun addAttribute(key: String, value: String, type: String) {
+    fun addAttribute(key: String, value: String, type: String, legal: String) {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-        when (type) {
+        val legalBasis = when (legal) {
+            PLYDataProcessingLegalBasis.ESSENTIAL.name -> PLYDataProcessingLegalBasis.ESSENTIAL
+            else -> PLYDataProcessingLegalBasis.OPTIONAL
+        }
+        when(type) {
             Integer::class.simpleName -> value.toIntOrNull()?.let {
-                Purchasely.setUserAttribute(key, it)
+                Purchasely.setUserAttribute(key, it, legalBasis)
             }
-
             Float::class.simpleName -> value.toFloatOrNull()?.let {
-                Purchasely.setUserAttribute(key, it)
+                Purchasely.setUserAttribute(key, it, legalBasis)
             }
-
             Boolean::class.simpleName -> value.toBooleanStrictOrNull()?.let {
-                Purchasely.setUserAttribute(key, it)
+                Purchasely.setUserAttribute(key, it, legalBasis)
             }
 
-            String::class.simpleName -> Purchasely.setUserAttribute(key, value)
+            String::class.simpleName -> Purchasely.setUserAttribute(key, value, legalBasis)
             Date::class.simpleName -> {
                 try {
                     dateFormat.parse(value)?.let {
-                        Purchasely.setUserAttribute(key, it)
+                        Purchasely.setUserAttribute(key, it, legalBasis)
                     }
                 } catch (e: Exception) {
-                    Log.e(Constants.TAG, "Unable to parse date $value", e)
+                    PLYLogger.e("Unable to parse date $value", e)
                 }
             }
+
+            "IntArray" -> {
+                val array = value.split(";").mapNotNull { it.toIntOrNull() }
+                Purchasely.setUserAttribute(key, array.toTypedArray<Int>(), legalBasis)
+            }
+            "FloatArray" -> {
+                val array = value.split(";").mapNotNull { it.toFloatOrNull() }
+                Purchasely.setUserAttribute(key, array.toTypedArray<Float>(), legalBasis)
+            }
+            "BooleanArray" -> {
+                val array = value.split(";").mapNotNull { it.toBooleanStrictOrNull() }
+                Purchasely.setUserAttribute(key, array.toTypedArray<Boolean>(), legalBasis)
+            }
+            "StringArray" -> {
+                val array = value.split(";")
+                Purchasely.setUserAttribute(key, array.toTypedArray<String>(), legalBasis)
+            }
+
         }
+        refreshAttributes()
+    }
+
+    /** Increment or decrement the Int attribute [key] by [amount] (blank means 1). */
+    fun stepAttribute(key: String, amount: String, legal: String, increment: Boolean) {
+        val legalBasis = if (legal == PLYDataProcessingLegalBasis.ESSENTIAL.name) PLYDataProcessingLegalBasis.ESSENTIAL else PLYDataProcessingLegalBasis.OPTIONAL
+        val value = amount.toIntOrNull() ?: 1
+        if (increment) Purchasely.incrementUserAttribute(key, value, legalBasis)
+        else Purchasely.decrementUserAttribute(key, value, legalBasis)
+        refreshAttributes()
+    }
+
+    /** Remove every user attribute. */
+    fun clearAttributes() {
+        Purchasely.clearUserAttributes()
         refreshAttributes()
     }
 
@@ -64,9 +103,12 @@ class AttributesViewModel() : ViewModel() {
      * Retrieve all the user's attributes.
      */
     private fun refreshAttributes() {
-        uiState.value = uiState.value.copy(
-            attributes = mutableMapOf<String, Any>().apply { putAll(Purchasely.userAttributes()) }
-        )
+        viewModelScope.launch {
+            delay(1.seconds)
+            uiState.value = uiState.value.copy(
+                attributes = mutableMapOf<String, Any>().apply { putAll(Purchasely.userAttributes()) }
+            )
+        }
     }
 }
 

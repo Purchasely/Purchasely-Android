@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -22,13 +23,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.purchasely.samplev2.presentation.common.navigationBarsContentPadding
 import com.purchasely.samplev2.presentation.common.CommonScreenHeader
 import com.purchasely.samplev2.presentation.common.CommonSearchBar
-import com.purchasely.samplev2.presentation.theme.Gray100
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -40,7 +44,10 @@ fun ProductsScreen(
     var searchQuery by remember { mutableStateOf("") }
     val uiState = viewModel.uiState.collectAsState()
 
-    Column(Modifier.background(Gray100)) {
+    Column(
+        Modifier
+            .background(colorScheme.background)
+    ) {
         CommonScreenHeader(
             title = "Products and Plans",
             onBackClick = { navController.navigateUp() }
@@ -51,7 +58,10 @@ fun ProductsScreen(
             viewModel.filterProductsByQuery(it)
         }
 
-        LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
+        LazyColumn(
+            contentPadding = navigationBarsContentPadding,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        ) {
             uiState.value.products.forEach { product ->
                 stickyHeader {
                     ProductItem(product)
@@ -75,32 +85,35 @@ fun ProductItem(product: Product) {
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(Gray100)
+            .background(colorScheme.background)
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(horizontal = 18.dp)
+            .padding(top = 18.dp, bottom = 12.dp)
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = "${product.name}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = product.vendorId,
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Gray,
-            )
-        }
-        Badge(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ) {
-            Text(
-                text = "${product.plans.size} plans",
+                fontFamily = FontFamily.Monospace,
                 fontSize = 12.sp,
-                color = Color.White,
-                modifier = Modifier.padding(4.dp)
+                color = colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
+        Text(
+            text = "${product.plans.size} " + if (product.plans.size == 1) "plan" else "plans",
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = colorScheme.onPrimary,
+            modifier = Modifier
+                .background(colorScheme.primary, RoundedCornerShape(percent = 50))
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+        )
     }
 }

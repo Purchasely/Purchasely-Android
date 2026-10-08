@@ -1,102 +1,76 @@
 package com.purchasely.samplev2.presentation.screen.paywall
 
-import android.app.Activity
 import android.util.Log
 import android.widget.FrameLayout
-import androidx.compose.foundation.layout.Box
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.purchasely.samplev2.presentation.navigation.Screen
 import com.purchasely.samplev2.presentation.util.Constants.Companion.TAG
-import io.purchasely.ext.PLYInterceptResult
-import io.purchasely.ext.Purchasely
+import com.purchasely.samplev2.presentation.util.info
 import io.purchasely.ext.presentation.PLYPresentation
-import io.purchasely.ext.presentation.PLYPresentationAction
-import io.purchasely.ext.presentation.preload
 import org.koin.androidx.compose.koinViewModel
 
-
+/**
+ * Embeds the presentation: preload (public API), then [PLYPresentation.buildView]. The info card
+ * shows the metadata the SDK exposes about what it resolved (audience, A/B test, campaign, flow).
+ */
 @Composable
 fun PaywallScreen(navController: NavController, viewModel: PaywallViewModel = koinViewModel()) {
-    val uiState by viewModel.uiState.collectAsState()
+    val presentation = viewModel.uiState.value.presentation
 
-    val context = LocalContext.current
-    val systemUiController = rememberSystemUiController()
-    systemUiController.isSystemBarsVisible = false
-
-    val activity = context as Activity
-    with(WindowCompat.getInsetsController(activity.window, activity.window.decorView)) {
-        systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-    }
-
-    // v6: register granular, type-safe per-action interceptors (replaces setPaywallActionsInterceptor)
-    DisposableEffect(Unit) {
-        Purchasely.interceptAction<PLYPresentationAction.Login> { _, _ ->
-            navController.navigateUp()
-            navController.navigate(Screen.Settings.route)
-            PLYInterceptResult.SUCCESS
-        }
-        Purchasely.interceptAction<PLYPresentationAction.Purchase> { info, purchase ->
-            if (viewModel.observerMode()) {
-                info.activity?.let { purchasingActivity ->
-                    viewModel.purchase(
-                        activity = purchasingActivity,
-                        purchase = purchase,
-                        onPurchaseSuccess = { navController.navigateUp() },
-                    )
-                }
-                PLYInterceptResult.SUCCESS // the app handles the purchase itself in observer mode
-            } else {
-                PLYInterceptResult.NOT_HANDLED // let the SDK handle the purchase
-            }
-        }
-        onDispose {
-            Purchasely.removeActionInterceptor<PLYPresentationAction.Login>()
-            Purchasely.removeActionInterceptor<PLYPresentationAction.Purchase>()
+    Column(modifier = Modifier.fillMaxSize().background(colorScheme.background)) {
+        if (presentation == null) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.CenterHorizontally).statusBarsPadding().padding(32.dp)
+            )
+        } else {
+            PresentationInfoCard(presentation)
+            AsyncPresentationView(presentation, onCloseClick = { navController.popBackStack() })
         }
     }
+}
 
-    // v6: build the presentation with the DSL, preload it, then embed buildView() in an AndroidView.
-    // This single path covers both the direct and "async" loading modes — there is no longer a
-    // separate synchronous presentationView() API.
-    val loaded by produceState<PLYPresentation?>(
-        initialValue = null,
-        uiState.placementId, uiState.presentationId, uiState.contentId
-    ) {
-        value = try {
-            PLYPresentation {
-                uiState.placementId?.let { placementId(it) }
-                uiState.presentationId?.let { screenId(it) }
-                uiState.contentId?.let { contentId(it) }
-                onCloseRequested { navController.navigateUp() }
-            }.preload()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error fetching paywall", e)
-            null
+@Composable
+private fun PresentationInfoCard(presentation: PLYPresentation) {
+    Column(modifier = Modifier.statusBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        presentation.info().forEach { (label, value) ->
+            Text(
+                text = "$label: ${value ?: "-"}",
+                style = typography.bodySmall,
+                color = colorScheme.onSurfaceVariant
+            )
         }
     }
+}
 
-    val presentation = loaded
-    if (presentation != null) {
-        AndroidView(
-            factory = { ctx -> presentation.buildView(ctx) ?: FrameLayout(ctx) }
-        )
-    } else if (uiState.asyncLoading) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+@Composable
+fun AsyncPresentationView(
+    presentation: PLYPresentation,
+    onCloseClick: () -> Unit,
+) {
+    AndroidView(
+        factory = { context ->
+            presentation.onCloseRequested = { onCloseClick() }
+            presentation.buildView(
+                context = context,
+            ) { outcome ->
+                val plan = outcome.plan
+                Log.d(TAG, "result: ${outcome.purchaseResult}, plan: $plan")
+                Toast.makeText(context, "${outcome.purchaseResult} ${plan?.name.orEmpty()}", Toast.LENGTH_SHORT).show()
+            } ?: FrameLayout(context)
         }
-    }
+    )
 }

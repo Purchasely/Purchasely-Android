@@ -1,18 +1,22 @@
 package com.purchasely.samplev2.presentation.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,8 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.purchasely.samplev2.presentation.theme.Gray500
-import com.purchasely.samplev2.presentation.theme.Gray700
+import androidx.compose.ui.unit.sp
 
 
 @Composable
@@ -40,66 +43,62 @@ fun CommonSearchBar(modifier: Modifier = Modifier, onValueChanged: ((String) -> 
     val focusManager = LocalFocusManager.current
     var state by remember { mutableStateOf(TextFieldValue("")) }
 
-    Surface(
-        shadowElevation = 3.dp,
-        shape = RoundedCornerShape(30.dp),
+    BasicTextField(
+        value = state,
+        onValueChange = {
+            state = it
+            onValueChanged(it.text)
+        },
+        singleLine = true,
+        maxLines = 1,
         modifier = modifier
-    ) {
-        BasicTextField(
-            value = state,
-            onValueChange = {
-                state = it
-                onValueChanged(it.text)
-            },
-            singleLine = true,
-            maxLines = 1,
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(8.dp))
-                .height(47.dp)
-                .fillMaxWidth(),
-            textStyle = TextStyle(
-                MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Medium
-            ),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            decorationBox = { innerTextField ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(start = 10.dp)
+            .fillMaxWidth()
+            .height(46.dp)
+            .background(colorScheme.surfaceVariant, RoundedCornerShape(14.dp))
+            .border(1.dp, colorScheme.outline, RoundedCornerShape(14.dp)),
+        textStyle = TextStyle(color = colorScheme.onSurface, fontSize = 15.sp),
+        cursorBrush = SolidColor(colorScheme.onSurface),
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        decorationBox = { innerTextField ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 14.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "search icon",
+                    tint = colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(17.dp)
+                )
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.CenterStart
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "search icon",
-                        tint = Gray700,
-                    )
-                    Box(
-                        modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        if (state.text.isEmpty())
-                            Text(
-                                text = "Search",
-                                color = Gray500,
-                            )
-                        innerTextField()
+                    if (state.text.isEmpty()) {
+                        Text(
+                            text = "Search",
+                            fontSize = 15.sp,
+                            color = colorScheme.onSurfaceVariant
+                        )
                     }
+                    innerTextField()
+                }
 
-                    if (state.text.isNotBlank()) {
-                        IconButton(onClick = {
-                            state = TextFieldValue("")
-                            onValueChanged(state.text)
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "clear search bar",
-                                tint = Gray700
-                            )
-                        }
-                    }
+                if (state.text.isNotBlank()) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "clear search bar",
+                        tint = colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .clickable {
+                                state = TextFieldValue("")
+                                onValueChanged(state.text)
+                            }
+                    )
                 }
             }
-        )
-    }
+        }
+    )
 }

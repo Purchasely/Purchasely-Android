@@ -6,17 +6,27 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
+import android.app.Activity
+import android.widget.Toast
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.ui.platform.LocalContext
+import io.purchasely.ext.PLYRunningMode
+import io.purchasely.ext.Purchasely
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,13 +37,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toLowerCase
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.purchasely.samplev2.presentation.theme.Gray500
+import androidx.compose.ui.unit.sp
+import com.purchasely.samplev2.presentation.common.DetailGrid
 import io.purchasely.models.PLYPlan
 
 
@@ -41,53 +51,59 @@ import io.purchasely.models.PLYPlan
 fun PlanCard(plan: PLYPlan) {
     var expanded by remember { mutableStateOf(false) }
     Card(
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer),
-        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, colorScheme.outline),
+        shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .padding(vertical = 5.dp)
-            .clip(shape = MaterialTheme.shapes.medium)
+            .padding(bottom = 12.dp)
             .clickable(onClick = { expanded = !expanded })
-
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 20.dp)
-                    .fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "${plan.name}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-
                     Text(
                         text = "${plan.vendorId}",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Gray500,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 12.sp,
+                        color = colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "${plan.store_product_id}",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Gray500,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 12.sp,
+                        color = colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
                 Icon(
                     imageVector = Icons.Default.ExpandMore,
-                    contentDescription = "expand",
+                    contentDescription = if (expanded) "collapse" else "expand",
+                    tint = colorScheme.onSurfaceVariant,
                     modifier = Modifier
-                        .align(CenterVertically)
-                        .graphicsLayer(
-                            rotationZ = animateFloatAsState(
-                                if (expanded) 180f else 0f
-                            ).value,
-                        )
+                        .size(18.dp)
+                        .graphicsLayer(rotationZ = animateFloatAsState(if (expanded) 180f else 0f).value)
                 )
             }
             AnimatedVisibility(
@@ -101,109 +117,88 @@ fun PlanCard(plan: PLYPlan) {
     }
 }
 
+
+/**
+ * Everything the SDK exposes about a plan, grouped the way it is read: what it costs, how long it
+ * runs, what the introductory offer changes, and the equivalent prices per period.
+ */
 @Composable
 fun PlanInformation(plan: PLYPlan) {
-    Column(modifier = Modifier.padding(vertical = 6.dp, horizontal = 16.dp)) {
-        Text(style = MaterialTheme.typography.bodyMedium,
-            text = "localized price: ${plan.localizedPrice()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "localized full price: ${plan.localizedFullPrice()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "localized intro. price: ${plan.localizedOfferPrice()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "localized full intro. price: ${plan.localizedFullOfferPrice()}"
-        )
-        Divider(Modifier.padding(vertical = 10.dp))
+    Column(
+        verticalArrangement = Arrangement.spacedBy(18.dp),
+        modifier = Modifier.padding(top = 14.dp)
+    ) {
+        HorizontalDivider(color = colorScheme.outline)
 
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "intro. period: ${plan.offerPeriod()?.unit?.name}"
+        DetailGrid(
+            listOf(
+                "Price" to plan.localizedPrice(),
+                "Full price" to plan.localizedFullPrice(),
+                "Amount" to "${plan.amount()}",
+                "Currency" to "${plan.currencyCode()} ${plan.currencySymbol()}".trim()
+            )
         )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "localized period: ${plan.localizedPeriod()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "localized intro. period: ${plan.localizedOfferPeriod()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "period unit: ${plan.period()?.unit?.name?.toLowerCase(Locale.current)}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "free trial period unit: ${plan.freeTrialPeriod()?.unit?.name}"
-        )
-        Divider(Modifier.padding(vertical = 10.dp))
 
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "duration: ${plan.duration()}"
+        DetailGrid(
+            listOf(
+                "Period" to plan.localizedPeriod(),
+                "Period unit" to (plan.period()?.unit?.name?.lowercase() ?: "N/A"),
+                "Duration" to "${plan.duration()}",
+                "Free trial" to "${plan.localizedTrialDuration()}"
+            )
         )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "intro. duration: ${plan.offerDuration()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "localized intro. duration: ${plan.localizedOfferDuration()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "localized trial duration: ${plan.localizedTrialDuration()}"
-        )
-        Divider(Modifier.padding(vertical = 10.dp))
 
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "intro. cycles: ${plan.offerCycles()}"
+        DetailGrid(
+            listOf(
+                "Intro price" to plan.localizedOfferPrice(),
+                "Full intro price" to plan.localizedFullOfferPrice(),
+                "Intro period" to plan.localizedOfferPeriod(),
+                "Intro period unit" to (plan.offerPeriod()?.unit?.name?.lowercase() ?: "N/A"),
+                "Intro duration" to plan.localizedOfferDuration(),
+                "Intro cycles" to "${plan.offerCycles(null)}",
+                "Free trial unit" to (plan.freeTrialPeriod()?.unit?.name?.lowercase() ?: "N/A")
+            )
         )
-        Text(style = MaterialTheme.typography.bodyMedium, text = "amount: ${plan.amount()}")
-        Text(style = MaterialTheme.typography.bodyMedium, text = "currency code: ${plan.currencyCode()}")
-        Text(style = MaterialTheme.typography.bodyMedium, text = "currency symbol: ${plan.currencySymbol()}")
-        Divider(Modifier.padding(vertical = 10.dp))
 
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "daily price: ${plan.dailyEquivalentPrice()}"
+        DetailGrid(
+            listOf(
+                "Daily price" to "${plan.dailyEquivalentPrice()}",
+                "Weekly price" to "${plan.weeklyEquivalentPrice()}",
+                "Monthly price" to "${plan.monthlyEquivalentPrice()}",
+                "Yearly price" to "${plan.yearlyEquivalentPrice()}"
+            )
         )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "weekly price: ${plan.weeklyEquivalentPrice()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "monthly price: ${plan.monthlyEquivalentPrice()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "yearly price: ${plan.yearlyEquivalentPrice()}"
-        )
-        Divider(Modifier.padding(vertical = 10.dp))
 
-        Text(style = MaterialTheme.typography.bodyMedium, text = "duration in days: ${plan.durationInDays()}")
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "duration in weeks: ${plan.durationInWeeks()}"
+        DetailGrid(
+            listOf(
+                "Days" to "${plan.durationInDays()}",
+                "Weeks" to "${plan.durationInWeeks()}",
+                "Months" to "${plan.durationInMonths()}",
+                "Quarters" to "${plan.durationInQuarters()}",
+                "Years" to "${plan.durationInYears()}"
+            )
         )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "duration in months: ${plan.durationInMonths()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "duration in quarters: ${plan.durationInQuarters()}"
-        )
-        Text(
-            style = MaterialTheme.typography.bodyMedium,
-            text = "duration in years: ${plan.durationInYears()}"
-        )
+
+        // Purchasely.purchase() only validates in Full mode; Observer apps buy through their own billing code.
+        val activity = LocalContext.current as? Activity
+        val isFull = Purchasely.runningMode == PLYRunningMode.Full
+        Button(
+            enabled = isFull && activity != null,
+            onClick = {
+                activity?.let {
+                    Purchasely.purchase(
+                        activity = it,
+                        plan = plan,
+                        onSuccess = { purchased -> Toast.makeText(it, "Purchased ${purchased?.name}", Toast.LENGTH_SHORT).show() },
+                        onError = { error -> Toast.makeText(it, "Error: ${error?.message}", Toast.LENGTH_SHORT).show() }
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (isFull) "Buy" else "Full mode only")
+        }
+
+        Text(text = plan.dump(), fontFamily = FontFamily.Monospace, fontSize = 10.sp, color = colorScheme.onSurfaceVariant)
     }
 }

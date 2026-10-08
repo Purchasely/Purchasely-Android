@@ -4,32 +4,34 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
-val Typography = Typography(
-    bodyLarge = TextStyle(
-        color = Gray700,
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+/** System fonts: the private Sample V2 brand fonts are commercial and not redistributed. */
+val DisplayFont = FontFamily.Serif
+
+val TextFont = FontFamily.SansSerif
+
+private fun TextStyle.display() = copy(fontFamily = DisplayFont, fontWeight = FontWeight.Medium)
+
+private fun TextStyle.text() = copy(fontFamily = TextFont)
+
+val Typography = with(Typography()) {
+    Typography(
+        displayLarge = displayLarge.display(),
+        displayMedium = displayMedium.display(),
+        displaySmall = displaySmall.display(),
+        headlineLarge = headlineLarge.display(),
+        headlineMedium = headlineMedium.display(),
+        headlineSmall = headlineSmall.display(),
+        titleLarge = titleLarge.display(),
+        titleMedium = titleMedium.text(),
+        titleSmall = titleSmall.text(),
+        // No colour on any style: text inherits LocalContentColor, so a container's contentColor
+        // reaches its labels instead of being overridden by the ambient body style.
+        bodyLarge = bodyLarge.text(),
+        bodyMedium = bodyMedium.text(),
+        bodySmall = bodySmall.text(),
+        labelLarge = labelLarge.text(),
+        labelMedium = labelMedium.text(),
+        labelSmall = labelSmall.text()
     )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
-)
+}
